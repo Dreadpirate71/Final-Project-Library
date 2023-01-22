@@ -16,27 +16,27 @@ namespace LibraryAPI.Daos
         {
             _context = context;
         }
-        public async Task<IEnumerable<Book>> GetBooks()
+        public async Task<IEnumerable<BookModel>> GetBooks()
         {
             var query = "SELECT * FROM Books";
             using (var connection = _context.CreateConnection())
             {
-                var books = await connection.QueryAsync<Book>(query);
+                var books = await connection.QueryAsync<BookModel>(query);
                 return books.ToList();
             }
         }
-        public async Task AddBook(string titleName, string authorFname, string authorLName, string type, decimal price, string Status, int patronId)
+        public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status, int patronId)
         {
-            var query = "INSERT INTO Books (titleName, authorFname, authorLName, type, price, Status, patronId)" +
-                $"VALUES )@titleName, @authorFname, @authorLName, @type, @price, @Status, @patronId);";
+            var query = "INSERT INTO Books (bookTitle, authorFName, authorLName, genre, price, status, patronId)" +
+                $"VALUES )@titleName, @authorFname, @authorLName, @genre, @price, @status, @patronId);";
 
             var parameters = new DynamicParameters();
-            parameters.Add("@titleName", titleName, DbType.String);
-            parameters.Add("@authorFname", authorFname, DbType.String);
+            parameters.Add("@bookTitle", bookTitle, DbType.String);
+            parameters.Add("@authorFName", authorFName, DbType.String);
             parameters.Add("@authorLName", authorLName, DbType.String);
-            parameters.Add("@type", type, DbType.String);
+            parameters.Add("@genre", genre, DbType.String);
             parameters.Add("@price", price, DbType.Decimal);
-            parameters.Add("@Status", Status, DbType.String);
+            parameters.Add("@status", status, DbType.String);
             parameters.Add("@patronId", patronId, DbType.Int32);
             
             using (var connection = _context.CreateConnection())

@@ -1,3 +1,4 @@
+using LibraryAPI.Daos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace LibraryAPI
         {
             services.AddSingleton<DapperContext>();
             services.AddControllers();
+            services.AddScoped<BookDao>();
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "LibraryApi",

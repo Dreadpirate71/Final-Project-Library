@@ -10,7 +10,7 @@ namespace LibraryApi.UnitTest
         [TestMethod]
         public void AddTitleTest()
         {
-            Book sut = new Book();
+            BookModel sut = new BookModel();
             string expectedBook = "Awesome!";
             sut.AddTitleName(expectedBook);
 
@@ -19,7 +19,7 @@ namespace LibraryApi.UnitTest
         
         public void AddAuthorTest()
         {
-            Book sut = new Book();
+            BookModel sut = new BookModel();
             string expectedAuthor = "AuthorFName";
             sut.AddAuthorNames(expectedAuthor);
             Assert.AreEqual(expectedAuthor, sut.authorFName);

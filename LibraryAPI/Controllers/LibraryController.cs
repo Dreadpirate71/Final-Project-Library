@@ -11,24 +11,35 @@ namespace LibraryAPI.Controllers
     {
         private readonly BookDao _bookDao;
 
-        private IBookDao bookDao;
+        private readonly IBookDao bookDao;
 
-        public BooksController()
-        {
-        }
 
         public BooksController(BookDao bookDao)
         {
             _bookDao = bookDao;
         }
-
-        [HttpPost]
+        [HttpGet]
         [Route("Books")]
-        public async Task<IActionResult> AddBook(string titleName, string authorFname, string authorLName, string type, decimal price, string Status, int patronId)
+        public async Task<IActionResult> GetBooks()
         {
             try
             {
-                await _bookDao.AddBook(titleName, authorFname, authorLName, type, price, Status, patronId);
+                var books = await _bookDao.GetBooks();
+                return Ok(books);
+            }
+            catch (Exception e) 
+            { 
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("Books")]
+        public async Task<IActionResult> AddBook(string bookTitle, string authorFname, string authorLName, string type, decimal price, string Status, int patronId)
+        {
+            try
+            {
+                await _bookDao.AddBook(bookTitle, authorFname, authorLName, type, price, Status, patronId);
                 return Ok();
             }
             catch (Exception e)

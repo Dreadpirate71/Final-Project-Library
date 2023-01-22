@@ -2,13 +2,13 @@
 
 namespace LibraryAPI.Models
 {
-    public class Book
+    public class BookModel
     {
-        public int titleId { get; set; } 
-        public string titleName { get; set; }   
+        public int Id { get; set; } 
+        public string bookTitle { get; set; }   
         public string authorFName { get; set; }
         public string authorLName { get; set; }
-        public string type { get; set; }
+        public string genre { get; set; }
         public decimal price{ get; set; }
         public string Status { get; set; } 
         public int patronId { get; set; }
