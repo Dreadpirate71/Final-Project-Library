@@ -5,21 +5,22 @@ namespace LibraryAPI.Models
     public class BookModel
     {
         public int Id { get; set; } 
-        public string bookTitle { get; set; }   
-        public string authorFName { get; set; }
-        public string authorLName { get; set; }
-        public string genre { get; set; }
-        public decimal price{ get; set; }
+        public string BookTitle { get; set; }   
+        public string AuthorFName { get; set; }
+        public string AuthorLName { get; set; }
+        public string Genre { get; set; }
+        public decimal Price{ get; set; }
         public string Status { get; set; } 
-        public int patronId { get; set; }
+        public int PatronId { get; set; }
 
-        public void AddTitleName(string titleName)
+        public string AddTitleName(string bookTitle)
         {
-            throw new NotImplementedException();
+            BookTitle = bookTitle;
+            return bookTitle;
         }
         public void AddAuthorNames(string authorName)
         {
-            throw new NotImplementedException();
+            AuthorFName= authorName;
         }
     }
 }

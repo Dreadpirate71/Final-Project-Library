@@ -127,7 +127,7 @@
             },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[5.1.0, )"
             },
             "Microsoft.OData.Edm": {
               "target": "Package",

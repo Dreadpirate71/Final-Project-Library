@@ -13,11 +13,16 @@ namespace LibraryAPI.Controllers
 
         private readonly IBookDao bookDao;
 
+        public BooksController(IBookDao bookDao)
+        {
+            this.bookDao = bookDao;
+        }
 
         public BooksController(BookDao bookDao)
         {
             _bookDao = bookDao;
         }
+
         [HttpGet]
         [Route("Books")]
         public async Task<IActionResult> GetBooks()
@@ -50,7 +55,7 @@ namespace LibraryAPI.Controllers
 
         public void CallDao()
         {
-            throw new NotImplementedException();
+            bookDao.GetBooks();
         }
     }
 }

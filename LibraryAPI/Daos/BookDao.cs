@@ -1,17 +1,25 @@
 ﻿using Dapper;
 using LibraryAPI.Models;
+using LibraryAPI.Wrappers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace LibraryAPI.Daos
 {
-    public class BookDao
+    public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
+        private readonly ISqlWrapper sqlWrapper;
+
+        public BookDao(ISqlWrapper sqlWrapper)
+        {
+            this.sqlWrapper = sqlWrapper;
+        }
         public BookDao(DapperContext context)
         {
             _context = context;
@@ -43,6 +51,10 @@ namespace LibraryAPI.Daos
             {
                 await connection.ExecuteAsync(query, parameters);
             }
+        }
+        public void GetBook()
+        {
+            sqlWrapper.Query<BookModel>("SELECT * FROM Books");
         }
     }
 }
