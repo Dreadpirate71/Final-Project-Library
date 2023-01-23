@@ -47,7 +47,7 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod BookControllerTest");
             Mock<IBookDao> mockBookDao = new Mock<IBookDao>();
 
-            BooksController sut = new BooksController(mockBookDao.Object);
+            BookController sut = new BookController(mockBookDao.Object);
             sut.CallDao();
             mockBookDao.Verify(bookDao => bookDao.GetBooks(), Times.Once);
         }

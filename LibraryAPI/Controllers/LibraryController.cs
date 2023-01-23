@@ -11,16 +11,9 @@ namespace LibraryAPI.Controllers
     {
         private readonly BookDao _bookDao;
 
-        private readonly IBookDao bookDao;
-
-        public BooksController(IBookDao bookDao)
+        public BooksController(BookDao _bookDao)
         {
-            this.bookDao = bookDao;
-        }
-
-        public BooksController(BookDao bookDao)
-        {
-            _bookDao = bookDao;
+            this._bookDao = _bookDao;
         }
 
         [HttpGet]
@@ -32,8 +25,8 @@ namespace LibraryAPI.Controllers
                 var books = await _bookDao.GetBooks();
                 return Ok(books);
             }
-            catch (Exception e) 
-            { 
+            catch (Exception e)
+            {
                 return StatusCode(500, e.Message);
             }
         }
@@ -52,7 +45,15 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+    }
+    public class BookController : ControllerBase
+    {
+        private readonly IBookDao bookDao;
 
+        public BookController(IBookDao bookDao)
+        {
+            this.bookDao = bookDao;
+        }
         public void CallDao()
         {
             bookDao.GetBooks();

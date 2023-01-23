@@ -29,6 +29,7 @@ namespace LibraryAPI
             services.AddSingleton<DapperContext>();
             services.AddControllers();
             services.AddScoped<BookDao>();
+            services.AddScoped<IBookDao, BookDao>();
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "LibraryApi",

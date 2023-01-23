@@ -7,10 +7,9 @@ namespace LibraryAPI.Daos
 {
     public interface IBookDao
     {
-        
+
         public void GetBooks()
         {
-            Console.WriteLine("Inside IBookDao GetBooks");
         }
     }
 }
