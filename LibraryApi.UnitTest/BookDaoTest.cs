@@ -12,18 +12,46 @@ using System.Threading.Tasks;
 namespace LibraryApi.UnitTest
 {
     [TestClass]
-    public class BookDaoTest
+    public class BookDaoTests
     {
-        [TestMethod]
-        public void CallSqlWithString()
+        private readonly Mock<ISqlWrapper> _mockSqlWrapper;
+        private readonly BookDao _bookDaoMock;
+        public BookDaoTests()
         {
-            Mock<ISqlWrapper> mockSqlWrapper = new Mock<ISqlWrapper>();
-            BookDao sut = new(mockSqlWrapper.Object);
-
-            sut.GetBook();
-
-            mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookModel> (It.Is<string>(sql => sql == "SELECT * FROM Books")), Times.Once);
-
+            _mockSqlWrapper = new Mock<ISqlWrapper>();
+            _bookDaoMock = new BookDao(_mockSqlWrapper.Object);
+        }
+        [TestMethod]
+        public void CallSqlWithSelectString_VerifyQueries_MatchingExpressionsConfirmed()
+        {
+            _bookDaoMock.GetBook();
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookAvailableModel>(It.Is<string>(sql => sql == "SELECT * FROM books_Available")), Times.Once);
+        }
+        [TestMethod]
+        public void CallSqlWithUpdateString_VerifyQueries_MatchingExpressionsConfirmed()
+        {
+            _bookDaoMock.UpdateBook();
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookAvailableModel>(It.Is<string>(sql => sql == "UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
+                                   $"Price = @Price, Status = @Status WHERE BookTitle = @BookTitle")), Times.Once);
+        }
+        [TestMethod]
+        public void CallSqlWithInsertString_VerifyQueries_MatchingExpressionsConfirmed()
+        {
+            _bookDaoMock.AddBook();
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookAvailableModel>(It.Is<string>(sql => sql == "INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
+                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status)")), Times.Once);
+        }
+        [TestMethod]
+        public void CallSqlWithUpdateWhereString_VerifyQueries_MatchingExpressionsConfirmed()
+        {
+            _bookDaoMock.GetBookTitle();
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookAvailableModel>(It.Is<string>(sql => sql == "SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'")), Times.Once);
+        }
+        [TestMethod]
+        public void CallSqlWithDeleteString_VerifyQueries_MatchingExpressionsConfirmed()
+        {
+            _bookDaoMock.DeleteBook();
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.Query<BookAvailableModel>(It.Is<string>(sql => sql == "DELETE * FROM books_Available WHERE Id = '{Id}'")), Times.Once);
         }
     }
 }
