@@ -130,4 +130,32 @@ namespace LibraryAPI.Controllers
             _interfaceBookDao.GetBook();
         }
     }
+    public class PatronsController : ControllerBase
+    {
+        private readonly IPatronDao _iFacePatronDao;
+        private readonly PatronDao _patronDao;
+
+        /*public PatronsController(IPatronDao iFacePatronDao)
+        {
+            this._iFacePatronDao= iFacePatronDao;
+        }*/
+        public PatronsController(PatronDao patronDao)
+        {
+            this._patronDao= patronDao;
+        }
+        [HttpGet]
+        [Route("Patrons")]
+        public async Task<IActionResult> GetListOfAllPatrons()
+        {
+            try
+            {
+                var patrons = await _patronDao.GetListOfAllPatrons();
+                return(Ok(patrons));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+    }
 }

@@ -30,6 +30,9 @@ namespace LibraryAPI
             services.AddControllers();
             services.AddScoped<BookDao>();
             services.AddScoped<IBookDao, BookDao>();
+            services.AddControllers();
+            services.AddScoped<PatronDao>();
+            services.AddScoped<IPatronDao, PatronDao>();
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "LibraryApi",
