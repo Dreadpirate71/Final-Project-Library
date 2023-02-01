@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj": {}
+    "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj": {
+    "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
         "projectName": "LibraryAPI",
-        "projectPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj",
-        "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\obj\\",
+        "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+        "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

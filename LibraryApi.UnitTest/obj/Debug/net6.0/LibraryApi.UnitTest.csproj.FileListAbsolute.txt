@@ -155,3 +155,6 @@ C:\Users\James.Remus\OneDrive - Veterans United Home Loans\Documents\Code VU\git
 C:\Users\James.Remus\OneDrive - Veterans United Home Loans\Documents\Code VU\git\LibraryApi Group Project\LibraryApi.UnitTest\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\James.Remus\OneDrive - Veterans United Home Loans\Documents\Code VU\git\LibraryApi Group Project\LibraryApi.UnitTest\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\James.Remus\OneDrive - Veterans United Home Loans\Documents\Code VU\git\LibraryApi Group Project\LibraryApi.UnitTest\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\Trey.Edwards\OneDrive - Veterans United Home Loans\Documents\VUCS\Project\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\LibraryApi.UnitTest.dll
+C:\Users\Trey.Edwards\OneDrive - Veterans United Home Loans\Documents\VUCS\Project\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\refint\LibraryApi.UnitTest.dll
+C:\Users\Trey.Edwards\OneDrive - Veterans United Home Loans\Documents\VUCS\Project\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\LibraryApi.UnitTest.pdb
