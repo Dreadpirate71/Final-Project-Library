@@ -16,12 +16,12 @@ namespace LibraryAPI.Daos
     public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
-        private readonly ISqlWrapper sqlWrapper;
+        private readonly ISqlWrapperBook _sqlWrapper;
 
 
-        public BookDao(ISqlWrapper sqlWrapper)
+        public BookDao(ISqlWrapperBook sqlWrapper)
         {
-            this.sqlWrapper = sqlWrapper;
+            this._sqlWrapper = sqlWrapper;
         }
         public BookDao(DapperContext context)
         {
@@ -94,26 +94,26 @@ namespace LibraryAPI.Daos
         }
         public void GetBook()
         {
-            sqlWrapper.Query<BookAvailableModel>("SELECT * FROM books_Available");
+            _sqlWrapper.QueryBook<BookAvailableModel>("SELECT * FROM books_Available");
         }
         public void UpdateBook()
         {
-            sqlWrapper.Query<BookAvailableModel>($"UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
+            _sqlWrapper.QueryBook<BookAvailableModel>($"UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
                         $"Price = @Price, Status = @Status WHERE BookTitle = @BookTitle");
         }
         public void AddBook()
         {
-            sqlWrapper.Query<BookAvailableModel>($"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
+            _sqlWrapper.QueryBook<BookAvailableModel>($"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
                 $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status)");
         }
         public void GetBookTitle()
         {
-            sqlWrapper.Query<BookAvailableModel>("SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'");
+            _sqlWrapper.QueryBook<BookAvailableModel>("SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'");
         }
 
         public void DeleteBook()
         {
-            sqlWrapper.Query<BookAvailableModel>("DELETE * FROM books_Available WHERE Id = '{Id}'");
+            _sqlWrapper.QueryBook<BookAvailableModel>("DELETE * FROM books_Available WHERE Id = '{Id}'");
         }
     }
 }
