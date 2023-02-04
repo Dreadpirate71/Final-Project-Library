@@ -22,9 +22,9 @@ namespace LibraryAPI.Daos
     public class StaffDao
     {
         private readonly DapperContext _context;
-        private readonly ISqlWrapper sqlWrapper;
+        private readonly ISqlWrapperStaff sqlWrapper;
 
-        public StaffDao(ISqlWrapper sqlWrapper)
+        public StaffDao(ISqlWrapperStaff sqlWrapper)
         {
             this.sqlWrapper = sqlWrapper;
         }
