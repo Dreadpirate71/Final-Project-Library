@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/hbwYBZK92dilqWUz3kzVT3nQMb3dMoOZB2qCCessYa1u5xyzr+xvcH5BPuSP0N3QX1mJecg8t80I559U5hsKQ==",
+  "dgSpecHash": "YPF6aAO39AEVOwkU8U/EyQRyJzOJzdWysiFMMaAHwE73RKUy5b/wYuX25KpNxLSlVx7J2Bo2r9x6XxcGR87PPA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj",
+  "projectFilePath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

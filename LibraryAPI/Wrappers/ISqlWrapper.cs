@@ -1,11 +1,22 @@
-﻿using System.Collections;
+﻿using LibraryAPI.Models;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LibraryAPI.Wrappers
 {
-    public interface ISqlWrapper
+    public interface ISqlWrapperBook
     {
-        Task<IEnumerable> Query<BookModel>(string sql);  
+        Task<IEnumerable> QueryBook<BookModel>(string sql);
     }
+    public interface ISqlWrapperPatron
+    {
+        Task<IEnumerable> QueryPatron<PatronModel>(string sql);
+
+    }
+    public interface ISqlWrapperStaff 
+    { 
+        Task<IEnumerable> QueryStaff(string sql);
+    }
+
 }

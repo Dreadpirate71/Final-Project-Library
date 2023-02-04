@@ -3243,11 +3243,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj",
+      "projectUniqueName": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
       "projectName": "LibraryAPI",
-      "projectPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj",
+      "projectPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
       "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\obj\\",
+      "outputPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
