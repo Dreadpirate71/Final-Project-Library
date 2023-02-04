@@ -1,8 +1,20 @@
 {
   "version": 2,
+<<<<<<< HEAD
+<<<<<<< HEAD
+  "dgSpecHash": "cXNRmpyvIKTJa5RQbhZFGiMARBdygkCnZplGAEPCRRB8Qa8byo3XiKXvTHupJSamFVc9YGD1QcU0crcsYLCSjQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+=======
   "dgSpecHash": "YPF6aAO39AEVOwkU8U/EyQRyJzOJzdWysiFMMaAHwE73RKUy5b/wYuX25KpNxLSlVx7J2Bo2r9x6XxcGR87PPA==",
   "success": true,
   "projectFilePath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+>>>>>>> James
+=======
+  "dgSpecHash": "YPF6aAO39AEVOwkU8U/EyQRyJzOJzdWysiFMMaAHwE73RKUy5b/wYuX25KpNxLSlVx7J2Bo2r9x6XxcGR87PPA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+>>>>>>> b56c204da5bd9621ab93821d4e563494ed4de838
   "expectedPackageFiles": [
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

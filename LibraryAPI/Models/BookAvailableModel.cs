@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.OData.Edm;
+using System;
 
 namespace LibraryAPI.Models
 {
-    public class BookModel
+    public class BookAvailableModel
     {
         public int Id { get; set; } 
         public string BookTitle { get; set; }   
@@ -10,8 +11,7 @@ namespace LibraryAPI.Models
         public string AuthorLName { get; set; }
         public string Genre { get; set; }
         public decimal Price{ get; set; }
-        public string Status { get; set; } 
-        public int PatronId { get; set; }
+        public string Status { get; set; }
 
         public string AddTitleName(string bookTitle)
         {
