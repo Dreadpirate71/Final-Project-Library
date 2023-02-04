@@ -12,6 +12,6 @@ namespace LibraryAPI.Wrappers
     public interface ISqlWrapperPatron
     {
         Task<IEnumerable> QueryPatron<PatronModel>(string sql);
-       
+
     }
 }
