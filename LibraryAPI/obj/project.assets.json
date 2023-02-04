@@ -3243,11 +3243,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
       "projectName": "LibraryAPI",
       "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
       "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\obj\\",
+=======
+      "projectUniqueName": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+      "projectName": "LibraryAPI",
+      "projectPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+      "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\obj\\",
+>>>>>>> James
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",

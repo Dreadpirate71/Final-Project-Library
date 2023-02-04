@@ -8,10 +8,23 @@ namespace LibraryAPI.Wrappers
     public interface ISqlWrapperBook
     {
         Task<IEnumerable> QueryBook<BookModel>(string sql);
+<<<<<<< HEAD
     }
     public interface ISqlWrapperPatron
     {
         Task<IEnumerable> QueryPatron<PatronModel>(string sql);
        
+=======
+>>>>>>> James
     }
+    public interface ISqlWrapperPatron
+    {
+        Task<IEnumerable> QueryPatron<PatronModel>(string sql);
+
+    }
+    public interface ISqlWrapperStaff 
+    { 
+        Task<IEnumerable> QueryStaff(string sql);
+    }
+
 }

@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {}
   },
   "projects": {
@@ -12,6 +13,19 @@
         "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
         "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\obj\\",
+=======
+    "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+        "projectName": "LibraryAPI",
+        "projectPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+        "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\obj\\",
+>>>>>>> James
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -1,3 +1,7 @@
 is_global = true
 build_property.RootNamespace = LibraryAPI
+<<<<<<< HEAD
 build_property.ProjectDir = C:\Users\Trey.Edwards\OneDrive - Veterans United Home Loans\Documents\VUCS\Project\Final-Project-Library\LibraryAPI\
+=======
+build_property.ProjectDir = C:\Users\James.Remus\Source\Repos\Final-Project-Library\LibraryAPI\
+>>>>>>> James
