@@ -28,11 +28,10 @@ namespace LibraryAPI.Wrappers
     public interface ISqlWrapperPatron
     {
         Task<IEnumerable> QueryPatron<PatronModel>(string sql);
-
+       
     }
-    public interface ISqlWrapperStaff 
-    { 
+    public interface ISqlWrapperStaff
+    {
         Task<IEnumerable> QueryStaff(string sql);
     }
-
 }
