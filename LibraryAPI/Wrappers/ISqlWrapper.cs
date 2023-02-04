@@ -14,4 +14,8 @@ namespace LibraryAPI.Wrappers
         Task<IEnumerable> QueryPatron<PatronModel>(string sql);
 
     }
+    public interface ISqlWrapperStaff
+    {
+        Task<IEnumerable> QueryStaff(string sql);
+    }
 }
