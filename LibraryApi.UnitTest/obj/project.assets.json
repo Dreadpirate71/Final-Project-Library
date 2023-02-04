@@ -8796,7 +8796,6 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "Dapper >= 2.0.123",
       "LibraryAPI >= 1.0.0",
       "MSTest.TestAdapter >= 2.2.7",
       "MSTest.TestFramework >= 2.2.7",
@@ -8848,10 +8847,6 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
-          "Dapper": {
-            "target": "Package",
-            "version": "[2.0.123, )"
-          },
           "MSTest.TestAdapter": {
             "target": "Package",
             "version": "[2.2.7, )"
