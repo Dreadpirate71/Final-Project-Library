@@ -29,6 +29,7 @@ namespace LibraryAPI
             services.AddSingleton<DapperContext>();
             services.AddControllers();
             services.AddScoped<BookDao>();
+            services.AddScoped<StaffDao>();
             services.AddScoped<IBookDao, BookDao>();
             services.AddControllers();
             services.AddScoped<PatronDao>();

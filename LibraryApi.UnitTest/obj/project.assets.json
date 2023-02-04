@@ -8796,6 +8796,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "Dapper >= 2.0.123",
       "LibraryAPI >= 1.0.0",
       "MSTest.TestAdapter >= 2.2.7",
       "MSTest.TestFramework >= 2.2.7",
@@ -8805,19 +8806,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\James.Remus\\.nuget\\packages\\": {}
+    "C:\\Users\\Trey.Edwards\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+      "projectUniqueName": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
       "projectName": "LibraryApi.UnitTest",
-      "projectPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
-      "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryApi.UnitTest\\obj\\",
+      "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+      "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -8831,8 +8832,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj": {
-              "projectPath": "C:\\Users\\James.Remus\\OneDrive - Veterans United Home Loans\\Documents\\Code VU\\git\\LibraryApi Group Project\\LibraryAPI\\LibraryAPI.csproj"
+            "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
+              "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj"
             }
           }
         }
@@ -8847,6 +8848,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "Dapper": {
+            "target": "Package",
+            "version": "[2.0.123, )"
+          },
           "MSTest.TestAdapter": {
             "target": "Package",
             "version": "[2.2.7, )"
