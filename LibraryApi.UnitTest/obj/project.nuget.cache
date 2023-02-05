@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FCYjCbgcVbn3HcQxeHcNBKYoQRhMMPUI0uHhKuXSnk/RnHo6v0c8lZInLvG4teOsygdnNsFDqLBtldmqn+VOfQ==",
+  "dgSpecHash": "w0vlSXZuZbXdrLBlU2hDiwxtpRO7q9PwT7NX6dhItvhUgKeM7LKP/7/0IqxdqVPvE65Nz74AvngYX1Xfq5ufzA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+  "projectFilePath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\James.Remus\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

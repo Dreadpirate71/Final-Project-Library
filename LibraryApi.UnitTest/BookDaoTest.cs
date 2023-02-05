@@ -25,33 +25,33 @@ namespace LibraryApi.UnitTest
         public void CallSqlWithSelectString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _bookDaoMock.GetBook();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookAvailableModel>(It.Is<string>(sql => sql == "SELECT * FROM books_Available")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "SELECT * FROM Books")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithUpdateString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _bookDaoMock.UpdateBook();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookAvailableModel>(It.Is<string>(sql => sql == "UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
-                                   $"Price = @Price, Status = @Status WHERE BookTitle = @BookTitle")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "UPDATE Books SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
+                                   $"Price = @Price, Status = @Status, CheckOutDate = @CheckOutDate, PatronId = @PatronId WHERE BookTitle = @BookTitle")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithInsertString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _bookDaoMock.AddBook();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookAvailableModel>(It.Is<string>(sql => sql == "INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
-                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status)")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
+                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithUpdateWhereString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _bookDaoMock.GetBookTitle();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookAvailableModel>(It.Is<string>(sql => sql == "SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "SELECT * FROM Books WHERE BookTitle = '{bookTitle}'")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithDeleteString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _bookDaoMock.DeleteBook();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookAvailableModel>(It.Is<string>(sql => sql == "DELETE * FROM books_Available WHERE Id = '{Id}'")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "DELETE FROM Books WHERE Id = '{Id}'")), Times.Once);
         }
     }
 }

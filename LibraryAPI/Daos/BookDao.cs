@@ -27,17 +27,17 @@ namespace LibraryAPI.Daos
         {
             _context = context;
         }
-        public async Task<IEnumerable<BookAvailableModel>> GetListOfAllBooks()
+        public async Task<IEnumerable<BookModel>> GetListOfAllBooks()
         {
             var query = "SELECT * FROM books_Available";
             using var connection = _context.CreateConnection();
-            var books = await connection.QueryAsync<BookAvailableModel>(query);
+            var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
         }
-        public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status)
+        public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status, string checkOutDate, int patronId)
         {
-            var query = $"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
-                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status)";
+            var query = $"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
+                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)";
             
             var parameters = new DynamicParameters();
             parameters.Add("@BookTitle", bookTitle, DbType.String);
@@ -46,12 +46,14 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", genre, DbType.String);
             parameters.Add("@Price", price, DbType.Decimal);
             parameters.Add("@Status", status, DbType.String);
+            parameters.Add("@CheckOutDate", checkOutDate, DbType.String);
+            parameters.Add("@PatronId", patronId,DbType.Int32);
 
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
         }
         
-        public async Task UpdateBookByTitle(BookAvailableModel updateRequest)
+        public async Task UpdateBookByTitle(BookModel updateRequest)
         {
             var query = $"UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
                         $"Price = @Price, Status = @Status, WHERE BookTitle = @BookTitle";
@@ -68,25 +70,25 @@ namespace LibraryAPI.Daos
             await connection.ExecuteAsync(query, parameters);
         }
 
-        public async Task<BookAvailableModel> GetBookByTitle(string bookTitle)
+        public async Task<BookModel> GetBookByTitle(string bookTitle)
         {
-            var query = $"SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'";
+            var query = $"SELECT * FROM Books WHERE BookTitle = '{bookTitle}'";
             using var connection = _context.CreateConnection();
-            var bookByTitle = await connection.QueryFirstOrDefaultAsync<BookAvailableModel>(query);
+            var bookByTitle = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
             return bookByTitle;
         }
-        public async Task<BookAvailableModel> GetBookById(int Id)
+        public async Task<BookModel> GetBookById(int Id)
         {
-            var query = $"SELECT * FROM books_Available WHERE Id = '{Id}'";
+            var query = $"SELECT * FROM Books WHERE Id = '{Id}'";
             using (var connection = _context.CreateConnection())
             {
-                var bookById = await connection.QueryFirstOrDefaultAsync<BookAvailableModel>(query);
+                var bookById = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
                 return bookById;
             }
         }
         public async Task DeleteBookById(int Id)
         {
-            var query = $"DELETE FROM books_Available WHERE Id = '{Id}'";
+            var query = $"DELETE FROM Books WHERE Id = '{Id}'";
             using (var connection = _context.CreateConnection())
             {
                 await connection.ExecuteAsync(query);
@@ -94,26 +96,26 @@ namespace LibraryAPI.Daos
         }
         public void GetBook()
         {
-            _sqlWrapper.QueryBook<BookAvailableModel>("SELECT * FROM books_Available");
+            _sqlWrapper.QueryBook<BookModel>("SELECT * FROM Books");
         }
         public void UpdateBook()
         {
-            _sqlWrapper.QueryBook<BookAvailableModel>($"UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
-                        $"Price = @Price, Status = @Status WHERE BookTitle = @BookTitle");
+            _sqlWrapper.QueryBook<BookModel>($"UPDATE Books SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
+                        $"Price = @Price, Status = @Status, CheckOutDate = @CheckOutDate, PatronId = @PatronId WHERE BookTitle = @BookTitle");
         }
         public void AddBook()
         {
-            _sqlWrapper.QueryBook<BookAvailableModel>($"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status)" +
-                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status)");
+            _sqlWrapper.QueryBook<BookModel>($"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
+                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)");
         }
         public void GetBookTitle()
         {
-            _sqlWrapper.QueryBook<BookAvailableModel>("SELECT * FROM books_Available WHERE BookTitle = '{bookTitle}'");
+            _sqlWrapper.QueryBook<BookModel>("SELECT * FROM Books WHERE BookTitle = '{bookTitle}'");
         }
 
         public void DeleteBook()
         {
-            _sqlWrapper.QueryBook<BookAvailableModel>("DELETE * FROM books_Available WHERE Id = '{Id}'");
+            _sqlWrapper.QueryBook<BookModel>("DELETE FROM Books WHERE Id = '{Id}'");
         }
     }
 }

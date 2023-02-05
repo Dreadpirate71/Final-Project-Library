@@ -36,13 +36,13 @@ namespace LibraryApi.UnitTest
     {
         private readonly Mock<IBookDao> _bookDaoMock;
         private readonly BooksController _booksControllerMock;
-        private BookAvailableModel _bookModelMock;
+        private BookModel _bookModelMock;
 
         public BooksControllerTests()
         {
             _bookDaoMock= new Mock<IBookDao>();
             _booksControllerMock = new BooksController(_bookDaoMock.Object);
-            _bookModelMock = new BookAvailableModel();
+            _bookModelMock = new BookModel();
         }
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
@@ -75,7 +75,7 @@ namespace LibraryApi.UnitTest
         public void AddBookTest_ActionExecutes_ReturnsOk()
         {
             Console.WriteLine("Inside TestMethod AddBookTest");
-            var result = _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In" );
+            var result = _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
             Assert.IsNotNull(result);
         }
 

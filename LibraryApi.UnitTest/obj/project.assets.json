@@ -8796,6 +8796,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "Dapper >= 2.0.123",
       "LibraryAPI >= 1.0.0",
       "MSTest.TestAdapter >= 2.2.7",
       "MSTest.TestFramework >= 2.2.7",
@@ -8810,11 +8811,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+      "projectUniqueName": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
       "projectName": "LibraryApi.UnitTest",
-      "projectPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+      "projectPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
       "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryApi.UnitTest\\obj\\",
+      "outputPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -8831,8 +8832,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
-              "projectPath": "C:\\Users\\James.Remus\\Source\\Repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj"
+            "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
+              "projectPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj"
             }
           }
         }
@@ -8847,6 +8848,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "Dapper": {
+            "target": "Package",
+            "version": "[2.0.123, )"
+          },
           "MSTest.TestAdapter": {
             "target": "Package",
             "version": "[2.2.7, )"

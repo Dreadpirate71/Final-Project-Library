@@ -54,14 +54,14 @@ namespace LibraryAPI.Daos
         {
             var query = "UPDATE Patrons SET FirstName = @FirstName, LastName = @LastName," +
                         $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @ PostalCode, PhoneNumber = @PhoneNumber" +
-                        $"WHERE Email = @Email";
+                        $" WHERE Email = @Email";
 
             var parameters = new DynamicParameters();
             parameters.Add("@FirstName", updateRequest.FirstName, DbType.String);
             parameters.Add("@LastName", updateRequest.LastName, DbType.String);
             parameters.Add("@Email", updateRequest.Email, DbType.String);
-            parameters.Add("@StreetAddress", updateRequest.Email, DbType.String);
-            parameters.Add("@City", updateRequest.Email, DbType.String);
+            parameters.Add("@StreetAddress", updateRequest.StreetAddress, DbType.String);
+            parameters.Add("@City", updateRequest.City, DbType.String);
             parameters.Add("@State", updateRequest.State, DbType.String);
             parameters.Add("@PostalCode", updateRequest.PostalCode, DbType.String);
             parameters.Add("@PhoneNumber", updateRequest.PhoneNumber, DbType.String);
@@ -90,7 +90,7 @@ namespace LibraryAPI.Daos
 
         public async Task DeletePatronById(int Id)
         {
-            var query = $"DELETE * FROM Patrons WHERE Id = '{Id}'";
+            var query = $"DELETE FROM Patrons WHERE Id = '{Id}'";
             using var connection = _dapperContext.CreateConnection();
             {
                 await connection.ExecuteAsync(query);
@@ -118,7 +118,7 @@ namespace LibraryAPI.Daos
 
         public void DeletePatron()
         {
-            _sqlWrapper.QueryPatron<PatronModel>("DELETE * FROM Patrons WHERE Id = '{Id}'");
+            _sqlWrapper.QueryPatron<PatronModel>("DELETE FROM Patrons WHERE Id = '{Id}'");
         }
         public void GetPatronId()
         {

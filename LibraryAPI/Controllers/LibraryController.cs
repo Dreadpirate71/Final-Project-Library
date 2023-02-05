@@ -76,11 +76,11 @@ namespace LibraryAPI.Controllers
         }
         [HttpPost]
         [Route("Books")]
-        public async Task<IActionResult> AddBook(string bookTitle, string authorFname, string authorLName, string genre, decimal price, string status)
+        public async Task<IActionResult> AddBook(string bookTitle, string authorFname, string authorLName, string genre, decimal price, string status, string checkOutDate, int patronId)
         {
             try
             {
-                await _bookDao.AddBook(bookTitle, authorFname, authorLName, genre, price, status);
+                await _bookDao.AddBook(bookTitle, authorFname, authorLName, genre, price, status, checkOutDate, patronId);
                 return Ok();
             }
             catch (Exception e)
@@ -90,7 +90,7 @@ namespace LibraryAPI.Controllers
         }
         [HttpPatch]
         [Route("Books/{Title}")]
-        public async Task<IActionResult> UpdateBookByTitle([FromBody] BookAvailableModel updateRequest)
+        public async Task<IActionResult> UpdateBookByTitle([FromBody] BookModel updateRequest)
         {
             try
             {
@@ -136,10 +136,10 @@ namespace LibraryAPI.Controllers
         private readonly IPatronDao _iFacePatronDao;
         private readonly PatronDao _patronDao;
 
-        /*public PatronsController(IPatronDao iFacePatronDao)
+        public PatronsController(IPatronDao iFacePatronDao)
         {
             this._iFacePatronDao= iFacePatronDao;
-        }*/
+        }
         public PatronsController(PatronDao patronDao)
         {
             this._patronDao= patronDao;

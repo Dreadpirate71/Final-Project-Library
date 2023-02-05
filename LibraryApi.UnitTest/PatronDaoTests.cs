@@ -51,7 +51,7 @@ namespace LibraryApi.UnitTest
         public void CallSqlWithDeleteString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _patronDaoMock.DeletePatron();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryPatron<PatronModel>(It.Is<string>(sql => sql == "DELETE * FROM Patrons WHERE Id = '{Id}'")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryPatron<PatronModel>(It.Is<string>(sql => sql == "DELETE FROM Patrons WHERE Id = '{Id}'")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithSelectString_VerifyQueries_MatchingExpressonsConfirmed()
