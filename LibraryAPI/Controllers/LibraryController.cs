@@ -158,61 +158,9 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        [HttpPatch]
-        [Route("Patrons/{Email}")]
-        public async Task<IActionResult> UpdatePatronByEmail([FromBody] PatronModel updateRequest)
-        {
-            try
-            {
-                var patron = await _patronDao.GetPatronByEmail(updateRequest.Email);
-                if (patron == null)
-                {
-                    return StatusCode(404);
-                }
-                await _patronDao.UpdatePatronByEmail(updateRequest);
-                return Ok(patron);
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }           
-        }
-        [HttpPost]
-        [Route("Patrons")]
-        public async Task<IActionResult> AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
-        {
-            try
-            {
-                await _patronDao.AddPatron(firstName, lastName, email, streetAddress, city, state, postalCode, phoneNumber);
-                return Ok();
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-            
-        }
         [HttpGet]
-        [Route("PatronByEmail/{Email}")]
-        public async Task <IActionResult> GetPatronByEmail([FromRoute] string Email)
-        {
-            try
-            {
-                var patron = await _patronDao.GetPatronByEmail(Email);
-                if (patron == null)
-                {
-                    return StatusCode(404);
-                }
-                return Ok(patron);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-        [HttpDelete]
-        [Route("Patrons/{Id}")]
-        public async Task<IActionResult>DeletePatronById([FromRoute] int Id)
+        [Route("PatronById/{Id}")]
+        public async Task<IActionResult> GetPatronById([FromRoute] int Id)
         {
             try
             {
@@ -229,8 +177,61 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpGet]
-        [Route("PatronById/{Id}")]
-        public async Task<IActionResult> GetPatronById([FromRoute] int Id)
+        [Route("PatronByEmail/{Email}")]
+        public async Task<IActionResult> GetPatronByEmail([FromRoute] string Email)
+        {
+            try
+            {
+                var patron = await _patronDao.GetPatronByEmail(Email);
+                if (patron == null)
+                {
+                    return StatusCode(404);
+                }
+                return Ok(patron);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpPost]
+        [Route("Patrons")]
+        public async Task<IActionResult> AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
+        {
+            try
+            {
+                await _patronDao.AddPatron(firstName, lastName, email, streetAddress, city, state, postalCode, phoneNumber);
+                return Ok();
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+            
+        }
+        
+        [HttpPatch]
+        [Route("Patrons/{Email}")]
+        public async Task<IActionResult> UpdatePatronByEmail([FromBody] PatronModel updateRequest)
+        {
+            try
+            {
+                var patron = await _patronDao.GetPatronByEmail(updateRequest.Email);
+                if (patron == null)
+                {
+                    return StatusCode(404);
+                }
+                await _patronDao.UpdatePatronByEmail(updateRequest);
+                return Ok(patron);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpDelete]
+        [Route("Patrons/{Id}")]
+        public async Task<IActionResult>DeletePatronById([FromRoute] int Id)
         {
             try
             {

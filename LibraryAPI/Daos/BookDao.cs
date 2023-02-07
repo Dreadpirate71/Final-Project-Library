@@ -36,7 +36,7 @@ namespace LibraryAPI.Daos
         }
         public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status, string checkOutDate, int patronId)
         {
-            var query = $"INSERT INTO books_Available (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
+            var query = $"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
                 $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)";
             
             var parameters = new DynamicParameters();
@@ -55,8 +55,8 @@ namespace LibraryAPI.Daos
         
         public async Task UpdateBookByTitle(BookModel updateRequest)
         {
-            var query = $"UPDATE books_Available SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
-                        $"Price = @Price, Status = @Status, WHERE BookTitle = @BookTitle";
+            var query = $"UPDATE Books SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
+                        $"Price = @Price, Status = @Status, CheckOutDate = @CheckOutDate, PatronId = @PatronId WHERE BookTitle = @BookTitle";
 
             var parameters = new DynamicParameters();
             parameters.Add("@BookTitle", updateRequest.BookTitle, DbType.String);
@@ -65,6 +65,8 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", updateRequest.Genre, DbType.String);
             parameters.Add("@Price", updateRequest.Price, DbType.Decimal);
             parameters.Add("@Status", updateRequest.Status, DbType.String);
+            parameters.Add("CheckOutDate", updateRequest.CheckOutDate, DbType.String);
+            parameters.Add("PatronId", updateRequest.PatronId, DbType.String);
 
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
