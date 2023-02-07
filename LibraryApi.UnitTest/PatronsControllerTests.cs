@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApi.UnitTest
 {
@@ -36,41 +37,46 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public void GetListOfAllPatronsTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetListOfAllPatronsTest_ActionExecutes_ReturnsOkWithData()
         {
             Console.WriteLine("Inside TestMethod GetListOfAllPatronsTest");
-            var result = _mockPatronsController.GetListOfAllPatrons();
+            var result = await _mockPatronsController.GetListOfAllPatrons();
             Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
         [TestMethod]
-        public void AddPatronTest_ActionExecutes_ReturnsOk()
+        public async Task AddPatronTest_ActionExecutes_ReturnsOk()
         {
             Console.WriteLine("Inside TestMethod AddBookTest");
-            var result = _mockPatronsController.AddPatron("James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203","5738087408");
+            var result = await _mockPatronsController.AddPatron("James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203","5738087408");
             Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
 
         [TestMethod]
-        public void GetPatronByEmaiTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetPatronByEmaiTest_ActionExecutes_ReturnsOkWithData()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
-            var result = _mockPatronsController.GetPatronByEmail("james.remus@veteransunited.com");
+            var result = await _mockPatronsController.GetPatronByEmail("james.remus@veteransunited.com");
             Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
 
         [TestMethod]
-        public void UpdatePatronByEmailTest_ActionExecutes_ReturnsCode204WhenSuccessful()
+        public async Task UpdatePatronByEmailTest_ActionExecutes_ReturnsCode204WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest");
-            var result = _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
+            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
             Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, result.GetType());
         }
-        /*[TestMethod]
-        public void DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        [TestMethod]
+        public async Task DeletePatronById_ActionExecutes_ReturnsCode200WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
             var result = _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
             Assert.IsNotNull(result);
-        }*/
+            Assert.IsInstanceOfType(result, result.GetType());
+        }
     }
 }

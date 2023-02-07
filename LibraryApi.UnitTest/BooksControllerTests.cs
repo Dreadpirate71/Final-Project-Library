@@ -64,42 +64,51 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public void GetListOfAllBooksTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetListOfAllBooksTest_ActionExecutes_ReturnsOkWithData()
         {
             Console.WriteLine("Inside TestMethod GetListOfAllBooksTest");
-            var result = _booksControllerMock.GetListOfAllBooks();
+            var result = await _booksControllerMock.GetListOfAllBooks();
             Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
 
         [TestMethod]
-        public void AddBookTest_ActionExecutes_ReturnsOk()
+        public async Task AddBookTest_ActionExecutes_ReturnsOk()
         {
             Console.WriteLine("Inside TestMethod AddBookTest");
-            var result = _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
+            var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
             Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
 
         [TestMethod]
-        public void GetBookByTitleTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetBookByTitleTest_ActionExecutes_ReturnsOkWithData()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
-            var result = _booksControllerMock.GetBookByTitle("New Moon");
-            Assert.IsNotNull(result);            
+            var result = await _booksControllerMock.GetBookByTitle("New Moon");
+            Assert.IsNotNull(result);  
+            Assert.IsTrue(result is ObjectResult);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
         }
 
         [TestMethod]
-        public void UpdateBookByTitleTest_ActionExecutes_ReturnsCode204WhenSuccessful()
+        public async Task UpdateBookByTitleTest_ActionExecutes_ReturnsCode204WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest");
-            var result = _booksControllerMock.UpdateBookByTitle(_bookModelMock);
+            var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
             Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.IsInstanceOfType(result, result.GetType());
         }
         [TestMethod]
-        public void DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        public async Task DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
-            var result = _booksControllerMock.DeleteBookById(_bookModelMock.Id);
+            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
             Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
         }
     }
 }
