@@ -35,14 +35,20 @@ namespace LibraryApi.UnitTest
     public class BooksControllerTests
     {
         private readonly Mock<IBookDao> _bookDaoMock;
+        private readonly Mock<IPatronDao> _patronDaoMock;
         private readonly BooksController _booksControllerMock;
+        private readonly PatronsController _patronsControllerMock;
         private BookModel _bookModelMock;
+        private PatronModel _patronModelMock;
 
         public BooksControllerTests()
         {
             _bookDaoMock= new Mock<IBookDao>();
+            _patronDaoMock= new Mock<IPatronDao>();
             _booksControllerMock = new BooksController(_bookDaoMock.Object);
+            _patronsControllerMock = new PatronsController(_patronDaoMock.Object);
             _bookModelMock = new BookModel();
+            _patronModelMock = new PatronModel();
         }
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
@@ -107,6 +113,14 @@ namespace LibraryApi.UnitTest
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+        }
+        [TestMethod]
+        public async Task CheckOutBook_ActionExecutes_ReturnsCode200WhenSuccessful()
+        {
+            Console.WriteLine("Inside TestMethod CheckOutBook");
+            var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
         }

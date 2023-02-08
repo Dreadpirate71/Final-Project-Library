@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LibraryAPI.Daos;
 using LibraryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
 
 
@@ -14,14 +16,16 @@ namespace LibraryAPI.Controllers
     {
         private readonly BookDao _bookDao;
         private readonly IBookDao _interfaceBookDao;
+        private readonly PatronDao _patronDao;
 
         public BooksController(IBookDao interfaceBookDao)
         {
             this._interfaceBookDao = interfaceBookDao;
         }
-        public BooksController(BookDao bookDao)
+        public BooksController(BookDao bookDao, PatronDao patronDao)
         {
             _bookDao = bookDao;
+            _patronDao = patronDao;
         }
 
         [HttpGet]
@@ -125,6 +129,34 @@ namespace LibraryAPI.Controllers
             {
                 return StatusCode(500, e.Message);
             }
+        }
+        [HttpPatch]
+        [Route("CheckOutBook/{bookTitle}, {patronEmail}")]
+        public async Task <IActionResult> CheckOutBook([FromRoute] string bookTitle, [FromRoute] string patronEmail)
+        {
+             
+            try
+            {
+                var book = await _bookDao.GetBookByTitle(bookTitle);
+                var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                if (book == null) 
+                {
+                    return StatusCode(404);
+                } 
+                if (patron == null)
+                {
+                    return StatusCode(404);
+                }
+                book.Status = "Out";
+                book.PatronId = patron.Id;
+                book.CheckOutDate = DateTime.Now.ToString("MM/dd/yyyy");
+                await _bookDao.UpdateBookByTitle(book);
+                return StatusCode(200);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            } 
         }
         public void CallDao()
         {
