@@ -16,10 +16,11 @@ namespace LibraryAPI.Daos
     public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
-        private readonly ISqlWrapperBook _sqlWrapper;
+        private readonly ISqlWrapper _sqlWrapper;
+        private readonly IDapperContext _dapperContext;
 
 
-        public BookDao(ISqlWrapperBook sqlWrapper)
+        public BookDao(ISqlWrapper sqlWrapper)
         {
             this._sqlWrapper = sqlWrapper;
         }
@@ -27,9 +28,14 @@ namespace LibraryAPI.Daos
         {
             _context = context;
         }
+        public BookDao(IDapperContext dapperContext)
+        {
+            _dapperContext = dapperContext;
+        }
+
         public async Task<IEnumerable<BookModel>> GetListOfAllBooks()
         {
-            var query = "SELECT * FROM books_Available";
+            var query = "SELECT * FROM Books";
             using var connection = _context.CreateConnection();
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
@@ -95,6 +101,14 @@ namespace LibraryAPI.Daos
             {
                 await connection.ExecuteAsync(query);
             }
+        }
+        public async Task<int> GetTotalOfCheckedOutBooks(int patronId)
+        {
+            var query = $"SELECT * FROM Books WHERE PatronId = '{patronId}'";
+            using var connection = _context.CreateConnection();
+            var booksOut = await connection.QueryAsync<BookModel>(query);
+            var numberBooksOut = booksOut.ToList().Count();
+            return numberBooksOut;
         }
         public void GetBook()
         {

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
 
 namespace LibraryApi.UnitTest
 {
@@ -74,9 +76,25 @@ namespace LibraryApi.UnitTest
         public async Task DeletePatronById_ActionExecutes_ReturnsCode200WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
-            var result = _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
+            var result = await _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, result.GetType());
         }
+        [TestMethod]
+        public async Task GetPatronByEmail_ActionExecutes_InternalErrorReturns500()
+        {
+            Console.WriteLine("Inside GetPatron internal error test.");
+            var result = await _mockPatronsController.GetPatronByEmail("foo@email.com") as ObjectResult;
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, result.StatusCode);
+        }
+        /*[TestMethod]
+        *//*public async Task GetPatronByEmail_ActionExecutes_ReturnsCode404NotFound()
+        {
+            //Arrange 
+            
+            Console.WriteLine("Inside GetPatron not found test.");
+            var result = (ObjectResult)await _mockPatronsController.GetPatronByEmail("james.remus@veteransunited.com");
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+        }*/
     }
 }

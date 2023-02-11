@@ -14,19 +14,20 @@ namespace LibraryAPI.Controllers
 {
     public class BooksController : ControllerBase
     {
-        private readonly BookDao _bookDao;
-        private readonly IBookDao _interfaceBookDao;
+        //private readonly BookDao _bookDao;
+        private readonly IBookDao _bookDao;
         private readonly PatronDao _patronDao;
 
-        public BooksController(IBookDao interfaceBookDao)
+        public BooksController(IBookDao bookDao, PatronDao patronDao)
         {
-            this._interfaceBookDao = interfaceBookDao;
+            this._bookDao = bookDao;
+            this._patronDao = patronDao;
         }
-        public BooksController(BookDao bookDao, PatronDao patronDao)
+        /*public BooksController(BookDao bookDao, PatronDao patronDao)
         {
             _bookDao = bookDao;
             _patronDao = patronDao;
-        }
+        }*/
 
         [HttpGet]
         [Route("Books")]
@@ -139,6 +140,7 @@ namespace LibraryAPI.Controllers
             {
                 var book = await _bookDao.GetBookByTitle(bookTitle);
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
                 if (book == null) 
                 {
                     return StatusCode(404);
@@ -160,22 +162,18 @@ namespace LibraryAPI.Controllers
         }
         public void CallDao()
         {
-            _interfaceBookDao.GetBook();
+            _bookDao.GetBook();
         }
     }
     public class PatronsController : ControllerBase
     {
-        private readonly IPatronDao _iFacePatronDao;
-        private readonly PatronDao _patronDao;
-
-        public PatronsController(IPatronDao iFacePatronDao)
-        {
-            this._iFacePatronDao= iFacePatronDao;
-        }
-        public PatronsController(PatronDao patronDao)
+        private readonly IPatronDao _patronDao;
+        
+        public PatronsController(IPatronDao patronDao)
         {
             this._patronDao= patronDao;
         }
+        
         [HttpGet]
         [Route("Patrons")]
         public async Task<IActionResult> GetListOfAllPatrons()
