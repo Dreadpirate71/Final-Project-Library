@@ -110,6 +110,13 @@ namespace LibraryAPI.Daos
             var numberBooksOut = booksOut.ToList().Count();
             return numberBooksOut;
         }
+        public async Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId)
+        {
+            var query = $"SELECT * FROM Books WHERE PatronId = '{patronId}'";
+            using var connection = _context.CreateConnection();
+            var booksOut = await connection.QueryAsync<BookModel>(query);
+            return booksOut.ToList();
+        }
         public void GetBook()
         {
             _sqlWrapper.QueryBook<BookModel>("SELECT * FROM Books");

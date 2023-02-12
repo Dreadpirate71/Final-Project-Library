@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LibraryAPI.Daos;
@@ -16,9 +18,9 @@ namespace LibraryAPI.Controllers
     {
         //private readonly BookDao _bookDao;
         private readonly IBookDao _bookDao;
-        private readonly PatronDao _patronDao;
+        private readonly IPatronDao _patronDao;
 
-        public BooksController(IBookDao bookDao, PatronDao patronDao)
+        public BooksController(IBookDao bookDao, IPatronDao patronDao)
         {
             this._bookDao = bookDao;
             this._patronDao = patronDao;
@@ -123,7 +125,7 @@ namespace LibraryAPI.Controllers
                 {
                     return StatusCode(404);
                 }
-                await _bookDao.DeleteBookById(Id);
+                await _bookDao.DeleteBookById(book.Id);
                 return StatusCode(200);
             }
             catch (Exception e)
@@ -159,6 +161,29 @@ namespace LibraryAPI.Controllers
             {
                 return StatusCode(500, e.Message);
             } 
+        }
+        [HttpGet]
+        [Route("BooksCheckedOut/{patronEmail}")]
+        public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail)
+        {
+            try
+            {
+                var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                if (patron == null)
+                {
+                    return StatusCode(404);
+                }
+                var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
+                if (patronBooksOut == null)
+                {
+                    return StatusCode(404);
+                }
+                return Ok(patronBooksOut);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
         public void CallDao()
         {
@@ -270,13 +295,16 @@ namespace LibraryAPI.Controllers
                 {
                     return StatusCode(404);
                 }
-                return Ok(patron);
+                await _patronDao.DeletePatronById(patron.Id);
+                return StatusCode(200);
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
+            
         }
+
     }
     public class StaffController : ControllerBase
     {

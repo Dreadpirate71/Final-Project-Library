@@ -1,6 +1,7 @@
 ﻿using LibraryAPI.Controllers;
 using LibraryAPI.Daos;
 using LibraryAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -45,7 +46,7 @@ namespace LibraryApi.UnitTest
         {
             _bookDaoMock= new Mock<IBookDao>();
             _patronDaoMock= new Mock<IPatronDao>();
-            _booksControllerMock = new BooksController(_bookDaoMock.Object);
+            _booksControllerMock = new BooksController(_bookDaoMock.Object, _patronDaoMock.Object);
             _patronsControllerMock = new PatronsController(_patronDaoMock.Object);
             _bookModelMock = new BookModel();
             _patronModelMock = new PatronModel();
@@ -85,8 +86,8 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod AddBookTest");
             var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is ObjectResult);
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsTrue(result is OkResult);
+            Assert.IsInstanceOfType(result, typeof(OkResult));
         }
 
         [TestMethod]
@@ -95,8 +96,8 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
             var result = await _booksControllerMock.GetBookByTitle("New Moon");
             Assert.IsNotNull(result);  
-            Assert.IsTrue(result is ObjectResult);
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsTrue(result is StatusCodeResult);
+            Assert.IsInstanceOfType(result, result.GetType());
         }
 
         [TestMethod]
@@ -105,16 +106,17 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest");
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is ObjectResult);
+            Assert.IsTrue(result is StatusCodeResult);
             Assert.IsInstanceOfType(result, result.GetType());
         }
         [TestMethod]
-        public async Task DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        public async Task DeleteBookById_ActionExecutes_ReturnsCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
-            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
+            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id) as StatusCodeResult;
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is ObjectResult);
+            Assert.IsTrue(result is StatusCodeResult);
+            Assert.AreEqual(result.StatusCode, StatusCodes.Status404NotFound);
         }
         [TestMethod]
         public async Task CheckOutBook_ActionExecutes_ReturnsCode200WhenSuccessful()

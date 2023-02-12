@@ -14,6 +14,5 @@ namespace LibraryAPI.Daos
         Task UpdatePatronByEmail(PatronModel patron);
         Task AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber);
         Task DeletePatronById(int id);
-       
     }
 }

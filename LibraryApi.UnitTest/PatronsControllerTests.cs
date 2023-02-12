@@ -24,9 +24,9 @@ namespace LibraryApi.UnitTest
         {
             _mockPatronDao = new Mock<IPatronDao>();
             _mockPatronsController = new PatronsController(_mockPatronDao.Object);
-            _mockPatronModel = new PatronModel();   
+            _mockPatronModel = new PatronModel();
         }
-       
+
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
@@ -50,42 +50,58 @@ namespace LibraryApi.UnitTest
         public async Task AddPatronTest_ActionExecutes_ReturnsOk()
         {
             Console.WriteLine("Inside TestMethod AddBookTest");
-            var result = await _mockPatronsController.AddPatron("James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203","5738087408");
+            var result = await _mockPatronsController.AddPatron("James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408");
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsInstanceOfType(result, typeof(OkResult));
         }
 
         [TestMethod]
-        public async Task GetPatronByEmaiTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetPatronByEmailTest_ActionExecutes_ReturnCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
-            var result = await _mockPatronsController.GetPatronByEmail("james.remus@veteransunited.com");
+            var result = await _mockPatronsController.GetPatronByEmail(_mockPatronModel.Email) as StatusCodeResult;
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
         }
 
         [TestMethod]
-        public async Task UpdatePatronByEmailTest_ActionExecutes_ReturnsCode204WhenSuccessful()
+        public async Task UpdatePatronByEmailTest_ActionExecutes_ReturnsCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest");
-            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
+            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel) as StatusCodeResult;
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+
+        }
+        /*[TestMethod]
+        *//*public async Task DeletePatronById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        {
+            Console.WriteLine("Inside Delete Patron 200 test");
+            _mockPatronModel.Id = 3;
+            var result = await _mockPatronsController.DeletePatronById(_mockPatronModel.Id) as StatusCodeResult;
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
+            Assert.AreEqual(StatusCodes.Status200OK, result.StatusCode);
+        }*/
+
+
+        [TestMethod]
+        public async Task DeletePatronById_ActionExecutes_ReturnsCode404WhenNull()
+        {
+            Console.WriteLine("Inside TestMethod DeletePatronById");
+            var result = await _mockPatronsController.DeletePatronById(3) as StatusCodeResult;
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, result.GetType());
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
         }
         [TestMethod]
-        public async Task DeletePatronById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        public async Task GetPatronByEmail_ActionExecutes_ReturnsCode404NotFound()
         {
-            Console.WriteLine("Inside TestMethod DeleteBookById");
-            var result = await _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, result.GetType());
-        }
-        [TestMethod]
-        public async Task GetPatronByEmail_ActionExecutes_InternalErrorReturns500()
-        {
-            Console.WriteLine("Inside GetPatron internal error test.");
-            var result = await _mockPatronsController.GetPatronByEmail("foo@email.com") as ObjectResult;
-            Assert.AreEqual(StatusCodes.Status500InternalServerError, result.StatusCode);
+            Console.WriteLine("Inside GetPatron 404 test.");
+            var result = await _mockPatronsController.GetPatronByEmail("foo@email.com") as StatusCodeResult;
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
         }
         /*[TestMethod]
         *//*public async Task GetPatronByEmail_ActionExecutes_ReturnsCode404NotFound()
