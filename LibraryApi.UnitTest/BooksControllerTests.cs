@@ -63,14 +63,6 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public void CallDao()
-        {
-            Console.WriteLine("Inside TestMethod CallDao");
-            _booksControllerMock.CallDao();
-            _bookDaoMock.Verify(bookDao => bookDao.GetBook(), Times.Once);
-        }
-
-        [TestMethod]
         public async Task GetListOfAllBooksTest_ActionExecutes_ReturnsOkWithData()
         {
             Console.WriteLine("Inside TestMethod GetListOfAllBooksTest");
@@ -91,38 +83,48 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public async Task GetBookByTitleTest_ActionExecutes_ReturnsOkWithData()
+        public async Task GetBookByTitleTest_ActionExecutes_ReturnsStatusCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
-            var result = await _booksControllerMock.GetBookByTitle("New Moon");
+            var result = await _booksControllerMock.GetBookByTitle("New Moon") as StatusCodeResult;
             Assert.IsNotNull(result);  
             Assert.IsTrue(result is StatusCodeResult);
             Assert.IsInstanceOfType(result, result.GetType());
+            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
         }
 
         [TestMethod]
         public async Task UpdateBookByTitleTest_ActionExecutes_ReturnsCode204WhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest");
+            //Act
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
+            //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is StatusCodeResult);
             Assert.IsInstanceOfType(result, result.GetType());
         }
+
         [TestMethod]
         public async Task DeleteBookById_ActionExecutes_ReturnsCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod DeleteBookById");
+            //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id) as StatusCodeResult;
+            //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is StatusCodeResult);
             Assert.AreEqual(result.StatusCode, StatusCodes.Status404NotFound);
         }
+
         [TestMethod]
-        public async Task CheckOutBook_ActionExecutes_ReturnsCode200WhenSuccessful()
+        public async Task CheckOutBook_ActionExecutes_ReturnsObjectWhenSuccessful()
         {
+            //Arrange
             Console.WriteLine("Inside TestMethod CheckOutBook");
+            //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
+            //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
         }

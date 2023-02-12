@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Azure.Messaging;
 using LibraryAPI.Daos;
 using LibraryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +105,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookByTitle(updateRequest.BookTitle);
                 if (book == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No book found with that title!");
                 }
                 await _bookDao.UpdateBookByTitle(updateRequest);
                 return StatusCode(204);
@@ -126,7 +127,7 @@ namespace LibraryAPI.Controllers
                     return StatusCode(404);
                 }
                 await _bookDao.DeleteBookById(book.Id);
-                return StatusCode(200);
+                return StatusCode(200, "The Book was deleted!");
             }
             catch (Exception e)
             {
@@ -150,6 +151,10 @@ namespace LibraryAPI.Controllers
                 if (patron == null)
                 {
                     return StatusCode(404);
+                }
+                if (patronBooksOut >= 5)
+                {
+                    return StatusCode(500, "Exceeded maximum of 5 books checked out! Please return a book to proceed.");
                 }
                 book.Status = "Out";
                 book.PatronId = patron.Id;
@@ -184,10 +189,6 @@ namespace LibraryAPI.Controllers
             {
                 return StatusCode(500, e.Message);
             }
-        }
-        public void CallDao()
-        {
-            _bookDao.GetBook();
         }
     }
     public class PatronsController : ControllerBase
