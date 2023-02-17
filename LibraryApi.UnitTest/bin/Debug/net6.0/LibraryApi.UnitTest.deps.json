@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "LibraryApi.UnitTest/1.0.0": {
         "dependencies": {
+          "Dapper": "2.0.123",
           "LibraryAPI": "1.0.0",
           "MSTest.TestAdapter": "2.2.7",
           "MSTest.TestFramework": "2.2.7",

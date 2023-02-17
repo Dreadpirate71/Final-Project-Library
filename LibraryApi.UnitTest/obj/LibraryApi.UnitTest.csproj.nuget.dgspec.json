@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj": {}
+    "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj": {
+    "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+        "projectUniqueName": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
         "projectName": "LibraryApi.UnitTest",
-        "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
-        "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryApi.UnitTest\\obj\\",
+        "projectPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\LibraryApi.UnitTest.csproj",
+        "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryApi.UnitTest\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +28,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
-                "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj"
+              "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
+                "projectPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj"
               }
             }
           }
@@ -89,17 +89,17 @@
         }
       }
     },
-    "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
+    "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+        "projectUniqueName": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
         "projectName": "LibraryAPI",
-        "projectPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
-        "packagesPath": "C:\\Users\\Trey.Edwards\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Trey.Edwards\\OneDrive - Veterans United Home Loans\\Documents\\VUCS\\Project\\Final-Project-Library\\LibraryAPI\\obj\\",
+        "projectPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\LibraryAPI.csproj",
+        "packagesPath": "C:\\Users\\James.Remus\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\James.Remus\\source\\repos\\Final-Project-Library\\LibraryAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Trey.Edwards\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\James.Remus\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
