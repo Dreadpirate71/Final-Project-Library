@@ -17,7 +17,6 @@ namespace LibraryAPI.Controllers
 {
     public class BooksController : ControllerBase
     {
-        //private readonly BookDao _bookDao;
         private readonly IBookDao _bookDao;
         private readonly IPatronDao _patronDao;
 
@@ -26,11 +25,6 @@ namespace LibraryAPI.Controllers
             this._bookDao = bookDao;
             this._patronDao = patronDao;
         }
-        /*public BooksController(BookDao bookDao, PatronDao patronDao)
-        {
-            _bookDao = bookDao;
-            _patronDao = patronDao;
-        }*/
 
         [HttpGet]
         [Route("Books")]
@@ -55,7 +49,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookByTitle(Title);
                 if (book == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No book found with that Title!");
                 }
                 return Ok(book);
             }
@@ -73,7 +67,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookById(Id);
                 if (book == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No book found with that Id!");
                 }
                 return Ok(book);
             }
@@ -108,7 +102,7 @@ namespace LibraryAPI.Controllers
                     return StatusCode(404, "No book found with that title!");
                 }
                 await _bookDao.UpdateBookByTitle(updateRequest);
-                return StatusCode(204);
+                return StatusCode(204, "Book has been updated!");
             }
             catch (Exception e)
             {
@@ -124,10 +118,10 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookById(Id);
                 if (book == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No book found with that Id!");
                 }
                 await _bookDao.DeleteBookById(book.Id);
-                return StatusCode(200, "The Book was deleted!");
+                return StatusCode(200);
             }
             catch (Exception e)
             {
@@ -143,18 +137,22 @@ namespace LibraryAPI.Controllers
             {
                 var book = await _bookDao.GetBookByTitle(bookTitle);
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
                 if (book == null) 
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Book with this title does not exist");
                 } 
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with this email does not exist!");
                 }
+                var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
                 if (patronBooksOut >= 5)
                 {
                     return StatusCode(500, "Exceeded maximum of 5 books checked out! Please return a book to proceed.");
+                }
+                else if (book.Status == "Out")
+                {
+                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out. ");
                 }
                 book.Status = "Out";
                 book.PatronId = patron.Id;
@@ -176,12 +174,12 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with that email does not exist!");
                 }
                 var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
                 if (patronBooksOut == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron does not have any books currently checked out!");
                 }
                 return Ok(patronBooksOut);
             }
@@ -223,7 +221,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronById(Id);
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with that Id number does not exist!");
                 }
                 return Ok(patron);
             }
@@ -241,7 +239,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(Email);
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with that email does not exist!");
                 }
                 return Ok(patron);
             }
@@ -275,7 +273,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(updateRequest.Email);
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with that email does not exist!");
                 }
                 await _patronDao.UpdatePatronByEmail(updateRequest);
                 return Ok(patron);
@@ -294,7 +292,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronById(Id);
                 if (patron == null)
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "Patron with that Id does not exist!");
                 }
                 await _patronDao.DeletePatronById(patron.Id);
                 return StatusCode(200);

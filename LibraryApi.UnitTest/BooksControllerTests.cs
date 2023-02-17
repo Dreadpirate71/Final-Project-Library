@@ -81,12 +81,26 @@ namespace LibraryApi.UnitTest
             Assert.IsTrue(result is OkResult);
             Assert.IsInstanceOfType(result, typeof(OkResult));
         }
-
+        [TestMethod]
+        public async Task GetBookByTitleTest_ActionExecutes_ReturnsBookObjectWhenOK()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetBookByTitleTest");
+            _ = _bookDaoMock.Setup(x => x.GetBookByTitle("New Moon")).ReturnsAsync(new BookModel { BookTitle = "New Moon" });
+            //Act
+            var result = await _booksControllerMock.GetBookByTitle("New Moon") as OkObjectResult;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is OkObjectResult);
+            //Assert.AreEqual(Ok, result);
+        }
         [TestMethod]
         public async Task GetBookByTitleTest_ActionExecutes_ReturnsStatusCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
+            //Act
             var result = await _booksControllerMock.GetBookByTitle("New Moon") as StatusCodeResult;
+            //Assert
             Assert.IsNotNull(result);  
             Assert.IsTrue(result is StatusCodeResult);
             Assert.IsInstanceOfType(result, result.GetType());
@@ -94,21 +108,20 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public async Task UpdateBookByTitleTest_ActionExecutes_ReturnsCode204WhenSuccessful()
+        public async Task UpdateBookByTitleTest_ActionExecutes_ReturnsObjectWhenSuccessful()
         {
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest");
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is StatusCodeResult);
-            Assert.IsInstanceOfType(result, result.GetType());
+            Assert.IsTrue(result is ObjectResult);
         }
 
         [TestMethod]
         public async Task DeleteBookById_ActionExecutes_ReturnsCode404WhenNull()
         {
-            Console.WriteLine("Inside TestMethod DeleteBookById");
+            Console.WriteLine("Inside TestMethod DeleteBookByIdNull");
             //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id) as StatusCodeResult;
             //Assert
@@ -116,7 +129,19 @@ namespace LibraryApi.UnitTest
             Assert.IsTrue(result is StatusCodeResult);
             Assert.AreEqual(result.StatusCode, StatusCodes.Status404NotFound);
         }
-
+        [TestMethod]
+        public async Task DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
+        {
+            Console.WriteLine("Inside TestMethod DeleteBookByIdOk");
+            //Arrange
+            _ = _bookDaoMock.Setup(x => x.DeleteBookById(11));
+            var result = await _booksControllerMock.DeleteBookById(11);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is StatusCodeResult);
+            //Assert.IsInstanceOfType(result, typeof(OkResult));
+            //Assert.AreEqual(StatusCodes.Status200OK, result);
+        }
         [TestMethod]
         public async Task CheckOutBook_ActionExecutes_ReturnsObjectWhenSuccessful()
         {
