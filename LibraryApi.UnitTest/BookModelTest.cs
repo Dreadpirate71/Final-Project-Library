@@ -11,7 +11,7 @@ namespace LibraryApi.UnitTest
         public void AddTitleTest()
         {
             //Arrange
-            BookAvailableModel sut = new();
+            BookModel sut = new();
             string expectedBook = "Awesome!";
             
             //Act
@@ -25,7 +25,7 @@ namespace LibraryApi.UnitTest
         [TestMethod]
         public void AddAuthorTest()
         {
-            BookAvailableModel sut = new();
+            BookModel sut = new();
             string expectedAuthor = "AuthorFName";
             sut.AddAuthorNames(expectedAuthor);
             Assert.AreEqual(expectedAuthor, sut.AuthorFName);

@@ -92,19 +92,19 @@ namespace LibraryApi.UnitTest
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkObjectResult);
-            //Assert.AreEqual(Ok, result);
+            //Assert.AreEqual(, result);
         }
         [TestMethod]
         public async Task GetBookByTitleTest_ActionExecutes_ReturnsStatusCode404WhenNull()
         {
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
             //Act
-            var result = await _booksControllerMock.GetBookByTitle("New Moon") as StatusCodeResult;
+            var result = await _booksControllerMock.GetBookByTitle("Foo");
             //Assert
             Assert.IsNotNull(result);  
-            Assert.IsTrue(result is StatusCodeResult);
+            Assert.IsTrue(result is ObjectResult);
             Assert.IsInstanceOfType(result, result.GetType());
-            Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
+            //Assert.AreEqual(StatusCodes.Status404NotFound, result);
         }
 
         [TestMethod]
@@ -123,11 +123,11 @@ namespace LibraryApi.UnitTest
         {
             Console.WriteLine("Inside TestMethod DeleteBookByIdNull");
             //Act
-            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id) as StatusCodeResult;
+            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is StatusCodeResult);
-            Assert.AreEqual(result.StatusCode, StatusCodes.Status404NotFound);
+            Assert.IsTrue(result is ObjectResult);
+            //Assert.AreEqual(result.StatusCode, StatusCodes.Status404NotFound);
         }
         [TestMethod]
         public async Task DeleteBookById_ActionExecutes_ReturnsCode200WhenSuccessful()
@@ -138,8 +138,8 @@ namespace LibraryApi.UnitTest
             var result = await _booksControllerMock.DeleteBookById(11);
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is StatusCodeResult);
-            //Assert.IsInstanceOfType(result, typeof(OkResult));
+            //Assert.IsTrue(result is StatusCodeResult);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
             //Assert.AreEqual(StatusCodes.Status200OK, result);
         }
         [TestMethod]

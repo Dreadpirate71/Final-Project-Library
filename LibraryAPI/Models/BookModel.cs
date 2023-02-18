@@ -15,13 +15,14 @@ namespace LibraryAPI.Models
         public string CheckOutDate { get; set; }
         public int PatronId { get; set; }
 
-        public void AddTitleName(string titleName)
+        public string AddTitleName(string titleName)
         {
-            throw new NotImplementedException();
+            BookTitle = titleName;
+            return BookTitle;
         }
         public void AddAuthorNames(string authorName)
         {
-            throw new NotImplementedException();
+            AuthorFName= authorName;
         }
     }
 }
