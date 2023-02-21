@@ -12,7 +12,7 @@ namespace LibraryAPI.Daos
         public void GetBook()
         {
         }
-        Task<IEnumerable<BookModel>> GetListOfAllBooks();
+        Task <IEnumerable<BookModel>> GetListOfAllBooks();
         Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status, string checkOutDate, int patronId);
         Task UpdateBookByTitle(BookModel bookModel);
         Task <BookModel> GetBookById(int id);
@@ -20,6 +20,6 @@ namespace LibraryAPI.Daos
         Task DeleteBookById(int id);
         Task<int> GetTotalOfCheckedOutBooks(int patronId);
         Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId);
-
+        Task <IEnumerable<BookModel>>GetListOfAllAvailableBooks();
     }
 }
