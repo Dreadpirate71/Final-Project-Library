@@ -315,3 +315,4 @@ C:\Users\James.Remus\source\repos\Final-Project-Library\LibraryApi.UnitTest\bin\
 C:\Users\James.Remus\source\repos\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\LibraryApi.UnitTest.csproj.CopyComplete
 C:\Users\James.Remus\source\repos\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\LibraryApi.UnitTest.genruntimeconfig.cache
 C:\Users\James.Remus\source\repos\Final-Project-Library\LibraryApi.UnitTest\obj\Debug\net6.0\ref\LibraryApi.UnitTest.dll
+C:\Users\James.Remus\source\repos\Final-Project-Library\LibraryApi.UnitTest\bin\Debug\net6.0\nunit.framework.dll

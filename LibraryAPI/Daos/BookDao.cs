@@ -13,7 +13,7 @@ using static System.Reflection.Metadata.BlobBuilder;
 
 namespace LibraryAPI.Daos
 {
-    public class BookDao : IBookDao
+        public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
         private readonly ISqlWrapper _sqlWrapper;
@@ -139,6 +139,11 @@ namespace LibraryAPI.Daos
         public void DeleteBook()
         {
             _sqlWrapper.QueryBook<BookModel>("DELETE FROM Books WHERE Id = '{Id}'");
+        }
+
+        public Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks()
+        {
+            throw new NotImplementedException();
         }
     }
 }
