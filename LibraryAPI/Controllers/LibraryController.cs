@@ -396,12 +396,22 @@ namespace LibraryAPI.Controllers
 
         [HttpPatch]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position)
+        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
         {
             try
             {
-                await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
-                return Ok();
+
+                var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
+                else
+                {
+                    await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
+                    return Ok();
+                }
+
             }
             catch (Exception e)
             {
