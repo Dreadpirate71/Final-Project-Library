@@ -115,6 +115,10 @@ namespace LibraryAPI.Daos
         {
             _sqlWrapper.QueryStaff<StaffModel>("SELECT * FROM Patrons");
         }
+        public void DeleteStaff()
+        {
+            _sqlWrapper.QueryStaff<StaffModel>("DELETE FROM Staff WHERE Id = '{Id}'");
+        }
 
     }
 
