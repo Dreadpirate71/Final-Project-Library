@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -364,17 +365,26 @@ namespace LibraryAPI.Controllers
         }
         [HttpDelete]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> DeleteStaffById([FromRoute] int Id)
+        public async Task<IActionResult> DeleteStaffById([FromRoute] int Id, int AdminId)
         {
             try
             {
                 var staff = await _staffDao.GetStaffById(Id);
-                if ( staff == null)
+                var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
+                if (staff == null ) 
                 {
                     return StatusCode(404);
                 }
-                await _staffDao.DeleteStaffById(Id);
-                return StatusCode(200);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
+                else
+                {
+                    await _staffDao.DeleteStaffById(Id);
+                    return StatusCode(200);
+                }
+
 
             }
             catch (Exception e)
@@ -382,6 +392,8 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+
         [HttpPatch]
         [Route("Staff/{Id}")]
         public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position)

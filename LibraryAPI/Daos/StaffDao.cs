@@ -58,15 +58,16 @@ namespace LibraryAPI.Daos
                 return staff.ToList();
             }
         }
-        public async Task<IEnumerable<StaffModel>> GetStaffById(int Id)
+        public async Task<StaffModel> GetStaffById(int Id)
         {
-            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id}";
+            var query = $"SELECT * FROM Staff WHERE Id = '{Id}'";
             using (var connection = _context.CreateConnection())
             {
-                var staff = await connection.QueryAsync<StaffModel>(query);
-                return staff.ToList();
+                var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+                return staff;
             }
         }
+
         public async Task<IEnumerable<StaffModel>> DeleteStaffById(int Id)
         {
             var query = $"DELETE FROM [Library].[dbo].[Staff] WHERE Id = {Id}";
@@ -99,7 +100,17 @@ namespace LibraryAPI.Daos
             }
            
         }
+        public async Task<StaffModel> CheckStaffForAdmin(int Id)
+        {
+            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id} AND [Library].[dbo].[Staff].[position] = 'Admin'";
 
+            using (var connection = _context.CreateConnection())
+            {
+                var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+
+                return staff;
+            }
+        }
     }
 
 }
