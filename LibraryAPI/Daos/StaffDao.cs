@@ -119,6 +119,11 @@ namespace LibraryAPI.Daos
         {
             _sqlWrapper.QueryStaff<StaffModel>("DELETE FROM Staff WHERE Id = '{Id}'");
         }
+        public void UpdateStaff()
+        {
+            _sqlWrapper.QueryStaff<StaffModel>("UPDATE Staff SET FirstName = @FirstName, LastName = @LastName,PhoneNumber = @PhoneNumber, Position = @Position WHERE Id = @Id");
+        }
+
 
     }
 

@@ -27,6 +27,7 @@ namespace LibraryApi.UnitTest
             _patronDaoMock.GetListOfAllPatronsTest();
             _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryPatron<PatronModel>(It.Is<string>(sql => sql == "SELECT * FROM Patrons")), Times.Once);
         }
+        [TestMethod]
         public void CallSqlWithUpdateString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _patronDaoMock.UpdatePatron();

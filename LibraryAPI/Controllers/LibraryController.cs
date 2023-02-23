@@ -94,17 +94,26 @@ namespace LibraryAPI.Controllers
         }
         [HttpPatch]
         [Route("Books/{Title}")]
-        public async Task<IActionResult> UpdateBookByTitle([FromBody] BookModel updateRequest)
+        public async Task<IActionResult> UpdateBookByTitle([FromBody] BookModel updateRequest, int AdminId)
         {
             try
             {
+                var adminCheck = await _bookDao.CheckStaffForAdmin(AdminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
                 var book = await _bookDao.GetBookByTitle(updateRequest.BookTitle);
                 if (book == null)
                 {
                     return StatusCode(404, "No book found with that title!");
                 }
-                await _bookDao.UpdateBookByTitle(updateRequest);
-                return StatusCode(204, "Book has been updated!");
+                else
+                {
+                    await _bookDao.UpdateBookByTitle(updateRequest);
+                    return StatusCode(204, "Book has been updated!");
+                }
+
             }
             catch (Exception e)
             {
@@ -327,7 +336,7 @@ namespace LibraryAPI.Controllers
     }
     public class StaffController : ControllerBase
     {
-        private readonly StaffDao _staffDao;
+        public readonly StaffDao _staffDao;
 
         public StaffController(StaffDao _staffDao)
         {

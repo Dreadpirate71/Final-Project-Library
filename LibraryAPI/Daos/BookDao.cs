@@ -147,5 +147,16 @@ namespace LibraryAPI.Daos
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
         }
+        public async Task<StaffModel> CheckStaffForAdmin(int Id)
+        {
+            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id} AND [Library].[dbo].[Staff].[position] = 'Admin'";
+
+            using (var connection = _context.CreateConnection())
+            {
+                var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+
+                return staff;
+            }
+        }
     }
 }
