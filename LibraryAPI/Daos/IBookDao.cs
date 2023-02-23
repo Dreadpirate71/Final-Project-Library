@@ -20,6 +20,10 @@ namespace LibraryAPI.Daos
         Task DeleteBookById(int id);
         Task<int> GetTotalOfCheckedOutBooks(int patronId);
         Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId);
+        Task<IEnumerable<BookModel>> GetBookByGenre(string bookGenre);
+
+
+
 
     }
 }

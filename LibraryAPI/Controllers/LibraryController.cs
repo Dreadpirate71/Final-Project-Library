@@ -8,6 +8,7 @@ using Azure.Messaging;
 using LibraryAPI.Daos;
 using LibraryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
@@ -182,6 +183,24 @@ namespace LibraryAPI.Controllers
                     return StatusCode(404, "Patron does not have any books currently checked out!");
                 }
                 return Ok(patronBooksOut);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("BookByGenre/{Genre}")]
+        public async Task<IActionResult> GetBookByGenre([FromRoute] string Genre)
+        {
+            try
+            {
+                var book = await _bookDao.GetBookByGenre(Genre);
+                if (book == null)
+                {
+                    return StatusCode(404, "No books found with that Genre.");
+                }
+                return Ok(book);
             }
             catch (Exception e)
             {
@@ -377,7 +396,7 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-
+ 
 
     }
 }
