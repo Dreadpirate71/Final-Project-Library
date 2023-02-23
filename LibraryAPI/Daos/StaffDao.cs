@@ -22,11 +22,11 @@ namespace LibraryAPI.Daos
     public class StaffDao
     {
         private readonly DapperContext _context;
-        private readonly ISqlWrapperStaff sqlWrapper;
+        private readonly ISqlWrapperStaff _sqlWrapper;
 
         public StaffDao(ISqlWrapperStaff sqlWrapper)
         {
-            this.sqlWrapper = sqlWrapper;
+            this._sqlWrapper = sqlWrapper;
         }
         public StaffDao(DapperContext context)
         {
@@ -111,6 +111,13 @@ namespace LibraryAPI.Daos
                 return staff;
             }
         }
+        public void GetListOfAllStaffTest()
+        {
+            _sqlWrapper.QueryStaff<StaffModel>("SELECT * FROM Patrons");
+        }
+
     }
 
 }
+
+

@@ -24,6 +24,6 @@ namespace LibraryAPI.Wrappers
 
     public interface ISqlWrapperStaff
     {
-        Task<IEnumerable> QueryStaff(string sql);
+        Task<IEnumerable> QueryStaff<StaffModel>(string sql);
     }
 }
