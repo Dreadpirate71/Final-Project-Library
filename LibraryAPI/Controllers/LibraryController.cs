@@ -122,17 +122,26 @@ namespace LibraryAPI.Controllers
         }
         [HttpDelete]
         [Route("DeleteBook/{Id}")]
-        public async Task<IActionResult>DeleteBookById([FromRoute] int Id)
+        public async Task<IActionResult>DeleteBookById([FromRoute] int Id, int AdminId)
         {
             try
             {
+                var adminCheck = await _bookDao.CheckStaffForAdmin(AdminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
                 var book = await _bookDao.GetBookById(Id);
                 if (book == null)
                 {
                     return StatusCode(404, "No book found with that Id!");
                 }
-                await _bookDao.DeleteBookById(book.Id);
-                return StatusCode(200);
+                else
+                {
+                    await _bookDao.DeleteBookById(book.Id);
+                    return StatusCode(200);
+                }
+
             }
             catch (Exception e)
             {
