@@ -64,5 +64,6 @@ namespace LibraryApi.UnitTest
             _bookDaoSqlWrapperMock.DeleteBook();
             _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryBook<BookModel>(It.Is<string>(sql => sql == "DELETE FROM Books WHERE Id = '{Id}'")), Times.Once);
         }
+
     }
 }

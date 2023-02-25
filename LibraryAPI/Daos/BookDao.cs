@@ -52,7 +52,7 @@ namespace LibraryAPI.Daos
         {
             var query = $"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
                 $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)";
-            
+
             var parameters = new DynamicParameters();
             parameters.Add("@BookTitle", bookTitle, DbType.String);
             parameters.Add("@AuthorFName", authorFName, DbType.String);
@@ -61,12 +61,12 @@ namespace LibraryAPI.Daos
             parameters.Add("@Price", price, DbType.Decimal);
             parameters.Add("@Status", status, DbType.String);
             parameters.Add("@CheckOutDate", checkOutDate, DbType.String);
-            parameters.Add("@PatronId", patronId,DbType.Int32);
+            parameters.Add("@PatronId", patronId, DbType.Int32);
 
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
         }
-        
+
         public async Task UpdateBookByTitle(BookModel updateRequest)
         {
             var query = $"UPDATE Books SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
@@ -147,6 +147,13 @@ namespace LibraryAPI.Daos
         public void DeleteBook()
         {
             _sqlWrapper.QueryBook<BookModel>("DELETE FROM Books WHERE Id = '{Id}'");
+        }
+        public async Task<IEnumerable<BookModel>> GetBookByGenre(string Genre)
+        {
+            var query = $"SELECT * FROM Books WHERE Genre = '{Genre}'";
+            using var connection = _context.CreateConnection();
+            var books = await connection.QueryAsync<BookModel>(query);
+            return books.ToList();
         }
     }
 }
