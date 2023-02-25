@@ -13,7 +13,7 @@ using static System.Reflection.Metadata.BlobBuilder;
 
 namespace LibraryAPI.Daos
 {
-    public class BookDao : IBookDao
+        public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
         private readonly ISqlWrapper _sqlWrapper;
@@ -36,6 +36,14 @@ namespace LibraryAPI.Daos
         public async Task<IEnumerable<BookModel>> GetListOfAllBooks()
         {
             var query = "SELECT * FROM Books";
+            using var connection = _context.CreateConnection();
+            var books = await connection.QueryAsync<BookModel>(query);
+            return books.ToList();
+        }
+
+        public async Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks()
+        {
+            var query = "SELECT * FROM Books WHERE Status = 'In'";
             using var connection = _context.CreateConnection();
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
