@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/LibraryAPI/obj/Debug/netcoreapp3.1/LibraryAPI.GeneratedMSBuildEditorConfig.editorconfig
+/LibraryAPI/obj/Debug/netcoreapp3.1/LibraryAPI.assets.cache
+/LibraryApi.UnitTest/obj/Debug/net6.0/LibraryApi.UnitTest.csproj.AssemblyReference.cache
+/LibraryApi.UnitTest/bin/Debug/net6.0/CoverletSourceRootsMapping
+/LibraryAPI/.vs/LibraryAPI/v17/.suo
+/LibraryApi.UnitTest/obj/Debug/net6.0/LibraryApi.UnitTest.assets.cache
+/LibraryApi.UnitTest/obj/Debug/net6.0/LibraryApi.UnitTest.csproj.AssemblyReference.cache
+/LibraryApi.UnitTest/obj/Debug/net6.0/LibraryApi.UnitTest.GeneratedMSBuildEditorConfig.editorconfig
+/LibraryApi.UnitTest/obj/LibraryApi.UnitTest.csproj.nuget.dgspec.json
+/LibraryApi.UnitTest/obj/LibraryApi.UnitTest.csproj.nuget.g.props
+/LibraryApi.UnitTest/obj/project.assets.json
+/LibraryApi.UnitTest/obj/project.nuget.cache
+/LibraryApi.UnitTest/bin/Debug/net6.0/CoverletSourceRootsMapping

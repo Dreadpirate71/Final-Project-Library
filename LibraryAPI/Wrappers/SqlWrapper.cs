@@ -31,7 +31,7 @@ namespace LibraryAPI.Wrappers
         }
         public SqlWrapper()
         {
-            ConnectionString = "server=VUHL-H0HJKN3\\SQLExpress; database=Library; Integrated Security=True; TrustServerCertificate=True";
+            ConnectionString = "server=VUHL-DRMKKN3\\SQLExpress; database=Library; Integrated Security=True; TrustServerCertificate=True";
         }
         public Task<IEnumerable> QueryBook<BookModel>(string sql)
         {

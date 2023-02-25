@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,6 +9,7 @@ using Azure.Messaging;
 using LibraryAPI.Daos;
 using LibraryAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.Edm;
@@ -41,21 +43,6 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpGet]
-        [Route("Available Books")]
-        public async Task<IActionResult> GetListOfAllAvailableBooks()
-        {
-            try 
-            {
-                var availableBooks = await _bookDao.GetListOfAllAvailableBooks();
-                return Ok(availableBooks);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
-        [HttpGet]
         [Route("BookByTitle/{Title}")]
         public async Task<IActionResult> GetBookByTitle([FromRoute] string Title)
         {
@@ -64,7 +51,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookByTitle(Title);
                 if (book == null)
                 {
-                    return StatusCode(404, "No book found with that title!");
+                    return StatusCode(404, "No book found with that Title!");
                 }
                 return Ok(book);
             }
@@ -117,7 +104,7 @@ namespace LibraryAPI.Controllers
                     return StatusCode(404, "No book found with that title!");
                 }
                 await _bookDao.UpdateBookByTitle(updateRequest);
-                return StatusCode(200);
+                return StatusCode(204, "Book has been updated!");
             }
             catch (Exception e)
             {
@@ -154,7 +141,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
                 if (book == null) 
                 {
-                    return StatusCode(404, "Book with this title does not exist!");
+                    return StatusCode(404, "Book with this title does not exist");
                 } 
                 if (patron == null)
                 {
@@ -167,7 +154,7 @@ namespace LibraryAPI.Controllers
                 }
                 else if (book.Status == "Out")
                 {
-                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out.");
+                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out. ");
                 }
                 book.Status = "Out";
                 book.PatronId = patron.Id;
@@ -203,7 +190,24 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        
+        [HttpGet]
+        [Route("BookByGenre/{Genre}")]
+        public async Task<IActionResult> GetBookByGenre([FromRoute] string Genre)
+        {
+            try
+            {
+                var book = await _bookDao.GetBookByGenre(Genre);
+                if (book == null)
+                {
+                    return StatusCode(404, "No books found with that Genre.");
+                }
+                return Ok(book);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
     }
     public class PatronsController : ControllerBase
     {
@@ -361,17 +365,26 @@ namespace LibraryAPI.Controllers
         }
         [HttpDelete]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> DeleteStaffById([FromRoute] int Id)
+        public async Task<IActionResult> DeleteStaffById([FromRoute] int Id, int AdminId)
         {
             try
             {
                 var staff = await _staffDao.GetStaffById(Id);
-                if ( staff == null)
+                var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
+                if (staff == null ) 
                 {
                     return StatusCode(404);
                 }
-                await _staffDao.DeleteStaffById(Id);
-                return StatusCode(200);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
+                else
+                {
+                    await _staffDao.DeleteStaffById(Id);
+                    return StatusCode(200);
+                }
+
 
             }
             catch (Exception e)
@@ -379,21 +392,33 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+
         [HttpPatch]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position)
+        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
         {
             try
             {
-                await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
-                return Ok();
+
+                var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "Not an admin ID");
+                }
+                else
+                {
+                    await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
+                    return Ok();
+                }
+
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
         }
-
+ 
 
     }
 }

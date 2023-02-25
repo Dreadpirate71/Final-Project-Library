@@ -22,11 +22,11 @@ namespace LibraryAPI.Daos
     public class StaffDao
     {
         private readonly DapperContext _context;
-        private readonly ISqlWrapperStaff sqlWrapper;
+        private readonly ISqlWrapperStaff _sqlWrapper;
 
         public StaffDao(ISqlWrapperStaff sqlWrapper)
         {
-            this.sqlWrapper = sqlWrapper;
+            this._sqlWrapper = sqlWrapper;
         }
         public StaffDao(DapperContext context)
         {
@@ -58,15 +58,16 @@ namespace LibraryAPI.Daos
                 return staff.ToList();
             }
         }
-        public async Task<IEnumerable<StaffModel>> GetStaffById(int Id)
+        public async Task<StaffModel> GetStaffById(int Id)
         {
-            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id}";
+            var query = $"SELECT * FROM Staff WHERE Id = '{Id}'";
             using (var connection = _context.CreateConnection())
             {
-                var staff = await connection.QueryAsync<StaffModel>(query);
-                return staff.ToList();
+                var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+                return staff;
             }
         }
+
         public async Task<IEnumerable<StaffModel>> DeleteStaffById(int Id)
         {
             var query = $"DELETE FROM [Library].[dbo].[Staff] WHERE Id = {Id}";
@@ -99,6 +100,28 @@ namespace LibraryAPI.Daos
             }
            
         }
+        public async Task<StaffModel> CheckStaffForAdmin(int Id)
+        {
+            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id} AND [Library].[dbo].[Staff].[position] = 'Admin'";
+
+            using (var connection = _context.CreateConnection())
+            {
+                var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+
+                return staff;
+            }
+        }
+        public void GetListOfAllStaffTest()
+        {
+            _sqlWrapper.QueryStaff<StaffModel>("SELECT * FROM Patrons");
+        }
+        public void DeleteStaff()
+        {
+            _sqlWrapper.QueryStaff<StaffModel>("DELETE FROM Staff WHERE Id = '{Id}'");
+        }
+
     }
 
 }
+
+
