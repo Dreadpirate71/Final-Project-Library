@@ -40,6 +40,14 @@ namespace LibraryAPI.Daos
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
         }
+
+        public async Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks()
+        {
+            var query = "SELECT * FROM Books WHERE Status = 'In'";
+            using var connection = _context.CreateConnection();
+            var books = await connection.QueryAsync<BookModel>(query);
+            return books.ToList();
+        }
         public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price, string status, string checkOutDate, int patronId)
         {
             var query = $"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
@@ -139,11 +147,6 @@ namespace LibraryAPI.Daos
         public void DeleteBook()
         {
             _sqlWrapper.QueryBook<BookModel>("DELETE FROM Books WHERE Id = '{Id}'");
-        }
-
-        public Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks()
-        {
-            throw new NotImplementedException();
         }
     }
 }
