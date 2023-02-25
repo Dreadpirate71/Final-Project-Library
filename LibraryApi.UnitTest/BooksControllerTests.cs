@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace LibraryApi.UnitTest
 {
@@ -84,6 +87,21 @@ namespace LibraryApi.UnitTest
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
             Assert.AreEqual(StatusCodes.Status200OK, resultStatusCode.StatusCode);
         }
+        [TestMethod]
+        public async Task GetListOfAllBooksTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetListOfAllBooks throws exception");
+            _bookDaoMock.Setup(book => book.GetListOfAllBooks()).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.GetListOfAllBooks();
+            var resultMessage = (result as ObjectResult).Value;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", resultMessage);
+        }
 
         [TestMethod]
         public async Task AddBookTest_ActionExecutes_ReturnsOk()
@@ -100,7 +118,7 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public async Task GetBookByTitleTest_ActionExecutes_ReturnsBookObjectWhenOK()
+        public async Task GetBookByTitleTest_SelectBookByTitle_ReturnsBookObjectWhenOK()
         {
             //Arrange
             Console.WriteLine("Inside TestMethod GetBookByTitleTest");
@@ -114,7 +132,7 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public async Task GetBookByTitleTest_ActionExecutes_ReturnsMessageWhenNull()
+        public async Task GetBookByTitleTest_SelectBookByTitle_ReturnsMessageWhenNull()
         {
             //Arrange
             Console.WriteLine("Inside TestMethod GetBookByTitleTest Null");
