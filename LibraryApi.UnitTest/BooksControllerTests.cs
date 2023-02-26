@@ -155,12 +155,12 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
-            var resultStatusCode = result as StatusCodeResult;
+            var resultMessage = (result as ObjectResult).Value;
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is StatusCodeResult);
-            Assert.AreEqual(StatusCodes.Status200OK, resultStatusCode.StatusCode);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Book has been updated!", resultMessage);
         }
 
         [TestMethod]

@@ -43,6 +43,20 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpGet]
+        [Route("Books/Available")]
+        public async Task<IActionResult> GetListOfAllAvailableBooks()
+        {
+            try
+            {
+                var booksAvailable = await _bookDao.GetListOfAllAvailableBooks();
+                return Ok(booksAvailable);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpGet]
         [Route("BookByTitle/{Title}")]
         public async Task<IActionResult> GetBookByTitle([FromRoute] string Title)
         {
@@ -51,7 +65,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookByTitle(Title);
                 if (book == null)
                 {
-                    return StatusCode(404, "No book found with that Title!");
+                    return StatusCode(404, "No book found with that title!");
                 }
                 return Ok(book);
             }
@@ -141,7 +155,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
                 if (book == null) 
                 {
-                    return StatusCode(404, "Book with this title does not exist");
+                    return StatusCode(404, "Book with this title does not exist!");
                 } 
                 if (patron == null)
                 {
@@ -154,7 +168,7 @@ namespace LibraryAPI.Controllers
                 }
                 else if (book.Status == "Out")
                 {
-                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out. ");
+                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out.");
                 }
                 book.Status = "Out";
                 book.PatronId = patron.Id;
