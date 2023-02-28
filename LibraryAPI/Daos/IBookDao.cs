@@ -21,7 +21,7 @@ namespace LibraryAPI.Daos
         Task<int> GetTotalOfCheckedOutBooks(int patronId);
         Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId);
         Task<IEnumerable<BookModel>> GetBookByGenre(string bookGenre);
-
+        Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks();
 
 
 

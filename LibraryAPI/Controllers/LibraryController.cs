@@ -43,6 +43,20 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpGet]
+        [Route("Books/Available")]
+        public async Task<IActionResult> GetListOfAllAvailableBooks()
+        {
+            try
+            {
+                var booksAvailable = await _bookDao.GetListOfAllAvailableBooks();
+                return Ok(booksAvailable);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpGet]
         [Route("BookByTitle/{Title}")]
         public async Task<IActionResult> GetBookByTitle([FromRoute] string Title)
         {
@@ -51,7 +65,7 @@ namespace LibraryAPI.Controllers
                 var book = await _bookDao.GetBookByTitle(Title);
                 if (book == null)
                 {
-                    return StatusCode(404, "No book found with that Title!");
+                    return StatusCode(404, "No book found with that title!");
                 }
                 return Ok(book);
             }
@@ -141,7 +155,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
                 if (book == null) 
                 {
-                    return StatusCode(404, "Book with this title does not exist");
+                    return StatusCode(404, "Book with this title does not exist!");
                 } 
                 if (patron == null)
                 {
@@ -154,7 +168,7 @@ namespace LibraryAPI.Controllers
                 }
                 else if (book.Status == "Out")
                 {
-                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out. ");
+                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out.");
                 }
                 book.Status = "Out";
                 book.PatronId = patron.Id;
@@ -327,9 +341,9 @@ namespace LibraryAPI.Controllers
     }
     public class StaffController : ControllerBase
     {
-        private readonly StaffDao _staffDao;
+        private readonly IStaffDao _staffDao;
 
-        public StaffController(StaffDao _staffDao)
+        public StaffController(IStaffDao _staffDao)
         {
             this._staffDao = _staffDao;
         }
@@ -373,11 +387,11 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
                 if (staff == null ) 
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No staff with that Id.");
                 }
                 if (adminCheck == null)
                 {
-                    return StatusCode(404, "Not an admin ID");
+                    return StatusCode(404, "Not an admin Id.");
                 }
                 else
                 {
@@ -396,21 +410,18 @@ namespace LibraryAPI.Controllers
 
         [HttpPatch]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
+        public async Task <IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
         {
             try
             {
-
                 var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
                 if (adminCheck == null)
                 {
-                    return StatusCode(404, "Not an admin ID");
+                    return StatusCode(404, "Not an admin Id.");
                 }
-                else
-                {
-                    await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
-                    return Ok();
-                }
+                
+                await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
+                return StatusCode(200, "Staff member has been updated.");
 
             }
             catch (Exception e)

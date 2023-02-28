@@ -9,11 +9,10 @@ namespace LibraryAPI.Daos
     {
         Task AddStaff(string FirstName, string LastName, string PhoneNumber, string Position);
         Task<IEnumerable<StaffModel>> GetStaff();
-        Task<IEnumerable<StaffModel>> GetStaffById(int Id);
+        Task<StaffModel> GetStaffById(int Id);
         Task<IEnumerable<StaffModel>> DeleteStaffById(int Id);
-        Task<IEnumerable<StaffModel>> UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position);
-
-
+        Task UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position);
+        Task <StaffModel>CheckStaffForAdmin(int Id);
 
     }
     
