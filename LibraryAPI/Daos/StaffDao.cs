@@ -19,7 +19,7 @@ using System;
 namespace LibraryAPI.Daos
 
 {
-    public class StaffDao
+    public class StaffDao : IStaffDao
     {
         private readonly DapperContext _context;
         private readonly ISqlWrapperStaff _sqlWrapper;
@@ -70,14 +70,14 @@ namespace LibraryAPI.Daos
 
         public async Task<IEnumerable<StaffModel>> DeleteStaffById(int Id)
         {
-            var query = $"DELETE FROM [Library].[dbo].[Staff] WHERE Id = {Id}";
+            var query = $"DELETE FROM Staff WHERE Id = {Id}";
             using (var connection = _context.CreateConnection())
             {
                 var staff = await connection.QueryAsync<StaffModel>(query);
                 return staff.ToList();
             }
         }
-        public async Task<IEnumerable<StaffModel>> UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position)
+        public async Task UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position)
         {
 
             var query = "UPDATE Staff SET FirstName = @FirstName, LastName = @LastName, PhoneNumber = @PhoneNumber, " +
@@ -86,7 +86,7 @@ namespace LibraryAPI.Daos
 
 
             var parameters = new DynamicParameters();
-            parameters.Add("@Id", Id, DbType.String);
+            parameters.Add("@Id", Id, DbType.Int32);
             parameters.Add("@FirstName", FirstName, DbType.String);
             parameters.Add("@LastName", LastName, DbType.String);
             parameters.Add("@PhoneNumber", PhoneNumber, DbType.String);
@@ -95,14 +95,13 @@ namespace LibraryAPI.Daos
 
             using (var connection = _context.CreateConnection())
             {
-                var staff = await connection.QueryAsync<StaffModel>(query, parameters);
-                return staff.ToList();
+                await connection.ExecuteAsync (query, parameters);
             }
            
         }
         public async Task<StaffModel> CheckStaffForAdmin(int Id)
         {
-            var query = $"SELECT * FROM [Library].[dbo].[Staff] WHERE Id = {Id} AND [Library].[dbo].[Staff].[position] = 'Admin'";
+            var query = $"SELECT * FROM Staff WHERE Id = {Id} AND position = 'Admin'";
 
             using (var connection = _context.CreateConnection())
             {

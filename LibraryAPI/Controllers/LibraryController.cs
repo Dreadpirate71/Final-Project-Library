@@ -341,9 +341,9 @@ namespace LibraryAPI.Controllers
     }
     public class StaffController : ControllerBase
     {
-        private readonly StaffDao _staffDao;
+        private readonly IStaffDao _staffDao;
 
-        public StaffController(StaffDao _staffDao)
+        public StaffController(IStaffDao _staffDao)
         {
             this._staffDao = _staffDao;
         }
@@ -387,11 +387,11 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
                 if (staff == null ) 
                 {
-                    return StatusCode(404);
+                    return StatusCode(404, "No staff with that Id.");
                 }
                 if (adminCheck == null)
                 {
-                    return StatusCode(404, "Not an admin ID");
+                    return StatusCode(404, "Not an admin Id.");
                 }
                 else
                 {
@@ -410,21 +410,18 @@ namespace LibraryAPI.Controllers
 
         [HttpPatch]
         [Route("Staff/{Id}")]
-        public async Task<IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
+        public async Task <IActionResult> UpdateStaffById([FromRoute]int Id, string FirstName, string LastName, string PhoneNumber, string Position, int AdminId)
         {
             try
             {
-
                 var adminCheck = await _staffDao.CheckStaffForAdmin(AdminId);
                 if (adminCheck == null)
                 {
-                    return StatusCode(404, "Not an admin ID");
+                    return StatusCode(404, "Not an admin Id.");
                 }
-                else
-                {
-                    await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
-                    return Ok();
-                }
+                
+                await _staffDao.UpdateStaffById(Id, FirstName, LastName, PhoneNumber, Position);
+                return StatusCode(200, "Staff member has been updated.");
 
             }
             catch (Exception e)

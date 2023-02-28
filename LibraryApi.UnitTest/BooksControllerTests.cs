@@ -43,6 +43,7 @@ namespace LibraryApi.UnitTest
         private readonly Mock<IPatronDao> _patronDaoMock;
         private readonly BooksController _booksControllerMock;
         private readonly PatronsController _patronsControllerMock;
+        private readonly IEnumerable <BookModel>? _booksNull;
         private BookModel _bookModelMock;
         private PatronModel _patronModelMock;
         private IEnumerable<BookModel> _books;
@@ -85,8 +86,9 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkObjectResult);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
-            Assert.AreEqual(StatusCodes.Status200OK, resultStatusCode.StatusCode);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
         }
+
         [TestMethod]
         public async Task GetListOfAllBooksTest_ThrowsException_ReturnsExceptionError()
         {
@@ -96,11 +98,11 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.GetListOfAllBooks();
-            var resultMessage = (result as ObjectResult).Value;
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", resultMessage);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -115,6 +117,22 @@ namespace LibraryApi.UnitTest
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkResult);
+        }
+
+        [TestMethod]
+        public async Task AddBookTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod AddBook throws exception");
+            _bookDaoMock.Setup(book => book.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001)).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001);
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -138,14 +156,29 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod GetBookByTitleTest Null");
             //Act
             var result = await _booksControllerMock.GetBookByTitle("Foo");
-            var resultMessage = (result as ObjectResult).Value;
+           
             //Assert
             //Assert.IsNotNull(result);  
             Assert.IsTrue(result is ObjectResult);
             Assert.IsInstanceOfType(result, result.GetType());
-            Assert.AreEqual("No book found with that title!", resultMessage);
+            Assert.AreEqual("No book found with that title!", (result as ObjectResult).Value);
         }
-        
+
+        [TestMethod]
+        public async Task GetBookByTitleTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetBookByTitle throws exception");
+            _bookDaoMock.Setup(book => book.GetBookByTitle("Foo")).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.GetBookByTitle("Foo");
+            
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
+        }
+
         [TestMethod]
         public async Task UpdateBookByTitleTest_UpdateBookRecord_ReturnsStatusCode200WhenSuccessful()
         {
@@ -155,12 +188,12 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
-            var resultMessage = (result as ObjectResult).Value;
-
+            Console.WriteLine(result.GetType());
             //Assert
+
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Book has been updated!", resultMessage);
+            Assert.AreEqual("Book has been updated!", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -171,12 +204,28 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
-            var resultMessage = (result as ObjectResult).Value;
-
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("No book found with that title!", resultMessage);
+            Assert.AreEqual("No book found with that title!", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookByTitleTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod UpdateBookByTitle throws exception");
+            _ = _bookDaoMock.Setup(arg => arg.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _bookDaoMock.Setup(book => book.UpdateBookByTitle(_bookModelMock)).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.UpdateBookByTitle(_bookModelMock);
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -185,11 +234,10 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod DeleteBookByIdNull");
             //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
-            var actual = (result as ObjectResult).Value;    
-            //Assert
+           
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("No book found with that Id!", actual);
+            Assert.AreEqual("No book found with that Id!", (result as ObjectResult).Value);
         }
         [TestMethod]
         public async Task DeleteBookById_DeletesBookRecord_ReturnsCode200WhenSuccessful()
@@ -201,13 +249,28 @@ namespace LibraryApi.UnitTest
             Console.WriteLine(_bookModelMock.Id);
             //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
-            var actual = result as StatusCodeResult;
+           
             //Assert
             //Console.WriteLine(actual.ToString());
             Assert.IsNotNull(result);
             Assert.IsTrue(result is StatusCodeResult);
             Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
-            Assert.AreEqual(StatusCodes.Status200OK, actual.StatusCode);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as StatusCodeResult).StatusCode);
+        }
+        [TestMethod]
+        public async Task DeleteBookByIdTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod DeleteBookById throws exception");
+            _ = _bookDaoMock.Setup(arg => arg.GetBookById(It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _bookDaoMock.Setup(book => book.DeleteBookById(1200)).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
+            
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -219,12 +282,11 @@ namespace LibraryApi.UnitTest
             _ = _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock)); 
             //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
-            var resultStatusCode = result as StatusCodeResult;
-            Console.WriteLine(resultStatusCode);
+            
             //Assert
             Assert.IsNotNull(result);
             //Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual(StatusCodes.Status200OK, resultStatusCode.StatusCode);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as StatusCodeResult).StatusCode);
         }
 
         [TestMethod]
@@ -238,13 +300,11 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
-            var resultMessage = (result as ObjectResult).Value;
-            //Console.WriteLine(resultMessage.ToString());
-
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Book with this title does not exist!", resultMessage);
+            Assert.AreEqual("Book with this title does not exist!", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -258,13 +318,11 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
-            var resultMessage = (result as ObjectResult).Value;
-            //Console.WriteLine(resultMessage.ToString());
-
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Patron with this email does not exist!", resultMessage);
+            Assert.AreEqual("Patron with this email does not exist!", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -277,12 +335,11 @@ namespace LibraryApi.UnitTest
             _ = _bookDaoMock.Setup(books => books.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(6));
             //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
-            var resultMessage = (result as ObjectResult).Value;
-            Console.WriteLine(resultMessage.ToString());
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Exceeded maximum of 5 books checked out! Please return a book to proceed.", resultMessage);
+            Assert.AreEqual("Exceeded maximum of 5 books checked out! Please return a book to proceed.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -296,12 +353,11 @@ namespace LibraryApi.UnitTest
             _ = _bookModelMock.Status = "Out";
             //Act
             var result = await _booksControllerMock.CheckOutBook(_bookModelMock.BookTitle, _patronModelMock.Email);
-            var resultMessage = (result as ObjectResult).Value;
-            Console.WriteLine(resultMessage.ToString());
+            
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Book Status = 'Out'. Please choose a book that is not already checked out.", resultMessage);
+            Assert.AreEqual("Book Status = 'Out'. Please choose a book that is not already checked out.", (result as ObjectResult).Value);
         }
         
         [TestMethod]
@@ -319,7 +375,66 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkObjectResult);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
-            Assert.AreEqual(StatusCodes.Status200OK, resultStatusCode.StatusCode);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+        }
+        [TestMethod]
+        public async Task GetListOfAllAvailableBooksTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetListOfAllAvailableBooks throws exception");
+            _bookDaoMock.Setup(book => book.GetListOfAllAvailableBooks()).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.GetListOfAllAvailableBooks();
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task GetBookByGenreTest_RunsQuery_ReturnsOkWithData()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetBookByGenre returns OK.");
+            _ = _bookDaoMock.Setup(book => book.GetBookByGenre(It.IsAny<string>())).Returns(Task.FromResult(_books));
+            //Act
+            var result = await _booksControllerMock.GetBookByGenre(_bookModelMock.Genre);
+            //Assert
+            Assert.IsNotNull (result);
+            Assert.IsTrue(result is OkObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as OkObjectResult).StatusCode);
+        }
+        [TestMethod]
+        public async Task GetBookByGenreTest_RunsQuery_ReturnMessageWhenNull()
+        {
+            //Arrange
+            Console.WriteLine("Insinde TestMethod GetBookByGenre returns null message");
+            
+            _ = _bookDaoMock.Setup(book => book.GetBookByGenre(It.IsAny<string>())).Returns(Task.FromResult(_booksNull));
+            //Act
+            var result = await _booksControllerMock.GetBookByGenre(null);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("No books found with that Genre.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task GetBookByGenreTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetBookByGenrre throws exception");
+            _bookDaoMock.Setup(book => book.GetBookByGenre(It.IsAny<string>())).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.GetBookByGenre("genre");
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
     }
 }
