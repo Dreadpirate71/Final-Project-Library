@@ -22,7 +22,7 @@ namespace LibraryAPI.Daos
         Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId);
         Task<IEnumerable<BookModel>> GetBookByGenre(string bookGenre);
         Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks();
-
+        Task<IEnumerable<string>> GetListOfGenres();
 
 
     }
