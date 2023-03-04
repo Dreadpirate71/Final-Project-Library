@@ -61,7 +61,7 @@ namespace LibraryAPI.Daos
             parameters.Add("@Price", price, DbType.Decimal);
             parameters.Add("@Status", status, DbType.String);
             parameters.Add("@CheckOutDate", checkOutDate, DbType.String);
-            parameters.Add("@PatronId", patronId, DbType.Int32);
+            parameters.Add("@PatronId", 1003, DbType.Int32);
 
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
@@ -79,8 +79,8 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", updateRequest.Genre, DbType.String);
             parameters.Add("@Price", updateRequest.Price, DbType.Decimal);
             parameters.Add("@Status", updateRequest.Status, DbType.String);
-            parameters.Add("CheckOutDate", updateRequest.CheckOutDate, DbType.String);
-            parameters.Add("PatronId", updateRequest.PatronId, DbType.String);
+            parameters.Add("@CheckOutDate", updateRequest.CheckOutDate, DbType.String);
+            parameters.Add("@PatronId", updateRequest.PatronId, DbType.Int32);
 
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
@@ -88,6 +88,7 @@ namespace LibraryAPI.Daos
 
         public async Task<BookModel> GetBookByTitle(string bookTitle)
         {
+            bookTitle = bookTitle.Replace("'", "''");
             var query = $"SELECT * FROM Books WHERE BookTitle = '{bookTitle}'";
             using var connection = _context.CreateConnection();
             var bookByTitle = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
@@ -154,6 +155,13 @@ namespace LibraryAPI.Daos
             using var connection = _context.CreateConnection();
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
+        }
+        public async Task <IEnumerable<string>> GetListOfGenres()
+        {
+            var query = $"SELECT DISTINCT Genre FROM Books";
+            using var connection = _context.CreateConnection();
+            var genres = await connection.QueryAsync<string>(query);
+            return genres.ToList();
         }
     }
 }

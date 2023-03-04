@@ -53,7 +53,7 @@ namespace LibraryAPI.Daos
         public async Task UpdatePatronByEmail(PatronModel updateRequest)
         {
             var query = "UPDATE Patrons SET FirstName = @FirstName, LastName = @LastName," +
-                        $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @ PostalCode, PhoneNumber = @PhoneNumber" +
+                        $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @PostalCode, PhoneNumber = @PhoneNumber" +
                         $" WHERE Email = @Email";
 
             var parameters = new DynamicParameters();

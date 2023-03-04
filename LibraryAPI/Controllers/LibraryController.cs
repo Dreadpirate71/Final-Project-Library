@@ -19,6 +19,18 @@ namespace LibraryAPI.Controllers
 {
     public class BooksController : ControllerBase
     {
+        public enum GenreEnum
+        {
+            ChildrensFiction,
+            Architecture,
+            Autobiography,
+            Biography,
+            Drama,
+            Education,
+            FairyTales,
+            History
+        }
+        private readonly GenreEnum _genreEnum;
         private readonly IBookDao _bookDao;
         private readonly IPatronDao _patronDao;
 
@@ -107,7 +119,7 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpPatch]
-        [Route("Books/{Title}")]
+        [Route("UpdateBook")]
         public async Task<IActionResult> UpdateBookByTitle([FromBody] BookModel updateRequest)
         {
             try
@@ -145,7 +157,7 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpPatch]
-        [Route("CheckOutBook/{bookTitle}, {patronEmail}")]
+        [Route("CheckOutBook/{bookTitle} {patronEmail}")]
         public async Task <IActionResult> CheckOutBook([FromRoute] string bookTitle, [FromRoute] string patronEmail)
         {
              
@@ -181,6 +193,33 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             } 
         }
+        [HttpPatch]
+        [Route("ReturnBook/{patronEmail} {bookTitle}")]
+
+        public async Task<IActionResult> ReturnBook([FromRoute] string patronEmail, [FromRoute] string bookTitle)
+        {
+            try
+            {
+                var book = await _bookDao.GetBookByTitle(bookTitle);
+                var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                if (book == null)
+                {
+                    return StatusCode(404, "No book found with that title");
+                }
+                if (patron == null)
+                {
+                    return StatusCode(404, "Patron with that email does not exist!");
+                }
+                book.PatronId = 1003;
+                book.Status = "In";
+                await _bookDao.UpdateBookByTitle(book);
+                return StatusCode(200);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
         [HttpGet]
         [Route("BooksCheckedOut/{patronEmail}")]
         public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail)
@@ -205,7 +244,22 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpGet]
+        [Route("ListOfGenres")]
+        public async Task<IActionResult> GetListOfGenres()
+        {
+            try
+            {
+                var genres = await _bookDao.GetListOfGenres();
+                return Ok(genres);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpGet]
         [Route("BookByGenre/{Genre}")]
+
         public async Task<IActionResult> GetBookByGenre([FromRoute] string Genre)
         {
             try
