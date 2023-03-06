@@ -3,6 +3,7 @@ using LibraryAPI.Models;
 using LibraryAPI.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,8 +17,8 @@ namespace LibraryAPI.Daos
         private readonly DapperContext _dapperContext;
         private readonly ISqlWrapperPatron _sqlWrapper;
 
-       public PatronDao(ISqlWrapperPatron sqlWrapper)
-        { 
+        public PatronDao(ISqlWrapperPatron sqlWrapper)
+        {
             this._sqlWrapper = sqlWrapper;
         }
         public PatronDao(DapperContext dapperContext)
@@ -30,10 +31,10 @@ namespace LibraryAPI.Daos
             var query = "SELECT * FROM Patrons";
             using var connection = _dapperContext.CreateConnection();
             var patrons = await connection.QueryAsync<PatronModel>(query);
-            return patrons.ToList();  
+            return patrons.ToList();
         }
 
-        public async Task<PatronModel>GetPatronById(int Id)
+        public async Task<PatronModel> GetPatronById(int Id)
         {
             var query = $"SELECT * FROM Patrons WHERE Id = '{Id}'";
             using var connection = _dapperContext.CreateConnection();
@@ -42,11 +43,11 @@ namespace LibraryAPI.Daos
                 return patronById;
             }
         }
-        public async Task<PatronModel>GetPatronByEmail(string Email)
+        public async Task<PatronModel> GetPatronByEmail(string Email)
         {
             var query = $"SELECT * FROM Patrons WHERE Email = '{Email}'";
             using var connection = _dapperContext.CreateConnection();
-    
+
             var patronByEmail = await connection.QueryFirstOrDefaultAsync<PatronModel>(query);
             return patronByEmail;
         }
@@ -96,6 +97,17 @@ namespace LibraryAPI.Daos
                 await connection.ExecuteAsync(query);
             }
         }
+
+        public async Task<dynamic> CheckEmailUnique(string email)
+        {
+            var query = $"SELECT Email FROM Patrons WHERE Email = '{email}'";
+            using var connection = _dapperContext.CreateConnection();
+            {
+                var patronEmail = await connection.QueryFirstOrDefaultAsync(query);
+                return patronEmail;
+            }
+        }
+
         public void GetListOfAllPatronsTest()
         {
             _sqlWrapper.QueryPatron<PatronModel>("SELECT * FROM Patrons");

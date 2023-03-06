@@ -337,13 +337,24 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpPost]
-        [Route("Patrons")]
-        public async Task<IActionResult> AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
+        [Route("Patrons/{email}")]
+        public async Task<IActionResult> AddPatron(string firstName, string lastName, [FromRoute] string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
         {
+            //string patronEmail = new string(email);
+            //return Ok(patronEmail);
             try
             {
-                await _patronDao.AddPatron(firstName, lastName, email, streetAddress, city, state, postalCode, phoneNumber);
-                return Ok();
+                //var patron = await _patronDao.GetPatronByEmail(email);
+                var patronEmail = await _patronDao.CheckEmailUnique(email);
+                if (patronEmail == null)
+                {
+                    await _patronDao.AddPatron(firstName, lastName, email, streetAddress, city, state, postalCode, phoneNumber);
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(400, "That email is already in use. Please use a different email.");
+                }
             }
             catch(Exception e)
             {

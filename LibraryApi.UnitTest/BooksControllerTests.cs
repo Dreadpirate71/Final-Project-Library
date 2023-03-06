@@ -49,6 +49,7 @@ namespace LibraryApi.UnitTest
         private IEnumerable<BookModel> _books;
         private BookModel? _bookModelMockNull;
         private PatronModel? _patronModelMockNull;
+        private readonly IEnumerable<string> _genres;
 
         public BooksControllerTests()
         {
@@ -59,6 +60,7 @@ namespace LibraryApi.UnitTest
             _bookModelMock = new BookModel() { Id = 1200, BookTitle = "Wonder and Chaos of Being", AuthorFName = "Kris", AuthorLName = "Remus", Genre = "Fiction", Price = (decimal)12.00, Status = "In", CheckOutDate = null, PatronId = 1111};
             _patronModelMock = new PatronModel();
             _books = new List<BookModel>() { _bookModelMock};
+            _genres = new List<string>() { "History", "Education", "Young Adult Fiction" };
         }
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
@@ -425,11 +427,42 @@ namespace LibraryApi.UnitTest
         public async Task GetBookByGenreTest_ThrowsException_ReturnsExceptionError()
         {
             //Arrange
-            Console.WriteLine("Inside TestMethod GetBookByGenrre throws exception");
+            Console.WriteLine("Inside TestMethod GetBookByGenre throws exception");
             _bookDaoMock.Setup(book => book.GetBookByGenre(It.IsAny<string>())).Throws<Exception>();
 
             //Act
             var result = await _booksControllerMock.GetBookByGenre("genre");
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task GetListOfGenresTest_QueryExecuted_ReturnsOKResultWhenSuccessful()
+        {
+            //Arrange
+            Console.WriteLine("Inside GetListOfGenresTest when successful.");
+            _bookDaoMock.Setup(genres => genres.GetListOfGenres()).Returns(Task.FromResult(_genres));
+
+            //Act
+            var result = await _booksControllerMock.GetListOfGenres();
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is OkObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+        }
+        [TestMethod]
+        public async Task GetListOfGenresTest_ThrowsException_ReturnsExceptionError()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod GetListOfGenres throws exception");
+            _bookDaoMock.Setup(genres => genres.GetListOfGenres()).Throws<Exception>();
+
+            //Act
+            var result = await _booksControllerMock.GetListOfGenres();
 
             //Assert
             Assert.IsNotNull(result);
