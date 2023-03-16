@@ -19,7 +19,7 @@ namespace LibraryAPI.Controllers
 {
     public class BooksController : ControllerBase
     {
-        public enum GenreEnum
+        /*public enum GenreEnum
         {
             ChildrensFiction,
             Architecture,
@@ -30,14 +30,16 @@ namespace LibraryAPI.Controllers
             FairyTales,
             History
         }
-        private readonly GenreEnum _genreEnum;
+        private readonly GenreEnum _genreEnum;*/
         private readonly IBookDao _bookDao;
         private readonly IPatronDao _patronDao;
+        private readonly IStaffDao _staffDao;
 
-        public BooksController(IBookDao bookDao, IPatronDao patronDao)
+        public BooksController(IBookDao bookDao, IPatronDao patronDao, IStaffDao staffDao)
         {
             this._bookDao = bookDao;
             this._patronDao = patronDao;
+            this._staffDao = staffDao;
         }
 
         [HttpGet]
@@ -119,11 +121,16 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpPatch]
-        [Route("UpdateBook")]
-        public async Task<IActionResult> UpdateBookByTitle([FromBody] BookModel updateRequest)
-        {
+        [Route("UpdateBook/{adminId}")]
+        public async Task<IActionResult> UpdateBookByTitle([FromRoute] int adminId, [FromBody] BookModel updateRequest)
+        {        
             try
             {
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "You need to have an adminId to complete this task");
+                }
                 var book = await _bookDao.GetBookByTitle(updateRequest.BookTitle);
                 if (book == null)
                 {
@@ -138,12 +145,17 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpDelete]
-        [Route("DeleteBook/{Id}")]
-        public async Task<IActionResult>DeleteBookById([FromRoute] int Id)
+        [Route("DeleteBook/{adminId} {bookId}")]
+        public async Task<IActionResult>DeleteBookById([FromRoute] int adminId, [FromRoute] int bookId)
         {
             try
             {
-                var book = await _bookDao.GetBookById(Id);
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId);
+                if (adminCheck == null)
+                {
+                    return StatusCode(404, "You need to have an adminId to complete this task");
+                }
+                var book = await _bookDao.GetBookById(bookId);
                 if (book == null)
                 {
                     return StatusCode(404, "No book found with that Id!");
@@ -204,7 +216,7 @@ namespace LibraryAPI.Controllers
                 var patron = await _patronDao.GetPatronByEmail(patronEmail);
                 if (book == null)
                 {
-                    return StatusCode(404, "No book found with that title");
+                    return StatusCode(404, "No book found with that title!");
                 }
                 if (patron == null)
                 {
