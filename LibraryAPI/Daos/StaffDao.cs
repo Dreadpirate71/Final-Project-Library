@@ -99,15 +99,19 @@ namespace LibraryAPI.Daos
             }
            
         }
-        public async Task<StaffModel> CheckStaffForAdmin(int Id)
+        public async Task<bool> CheckStaffForAdmin(int Id)
         {
             var query = $"SELECT * FROM Staff WHERE Id = {Id} AND position = 'Admin'";
 
             using (var connection = _context.CreateConnection())
             {
                 var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
+                if (staff == null)
+                {
+                    return false;
+                }
 
-                return staff;
+                return true;
             }
         }
         public void GetListOfAllStaffTest()

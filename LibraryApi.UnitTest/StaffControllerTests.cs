@@ -105,7 +105,7 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside DeleteStaffById test returns 200.");
             _ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             //Act
             var result = await _mockStaffController.DeleteStaffById(_mockStaffModel.Id, _mockStaffModel.Id);
 
@@ -121,7 +121,7 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside DeleteStaffById test returns null message.");
             _ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModelNull));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             //Act
             var result = await _mockStaffController.DeleteStaffById(_mockStaffModel.Id, _mockStaffModel.Id);
 
@@ -137,7 +137,7 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside DeleteStaffById test returns null message.");
             _ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModelNull));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(false));
             //Act
             var result = await _mockStaffController.DeleteStaffById(_mockStaffModel.Id, _mockStaffModel.Id);
 
@@ -153,7 +153,7 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside TestMethod DeleteStaff throws exception");
             _ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _mockStaffDao.Setup(staff => staff.DeleteStaffById(5)).Throws<Exception>();
 
             //Act
@@ -170,7 +170,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside UpdateStaffTest returns code 200.");
-            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             //_ = _mockStaffDao.Setup(staff => staff.UpdateStaffById(3, "Kris", "Remus", "5738086263", "Librarian"));
             //Act
             var result = _mockStaffController.UpdateStaffById(3, "Kris", "Remus", "5738086263", "Librarian",4).Result;
@@ -187,7 +187,7 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside UpdateStaffById test returns null message.");
             _ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModelNull));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModel));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             //Act
             var result = await _mockStaffController.UpdateStaffById(3, "Kris", "Remus", "5738086263", "Librarian", 4);
 
@@ -198,12 +198,12 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
-        public async Task UpdateStaffByIdTest_TaskExecutes_ReturnsMessageWhenCheckStaffIsNull()
+        public async Task UpdateStaffByIdTest_TaskExecutes_ReturnsMessageWhenCheckStaffIsFalse()
         {
             //Arrange
             Console.WriteLine("Inside UpdateStaffById test returns null message.");
             //_ = _mockStaffDao.Setup(staff => staff.GetStaffById(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModelNull));
-            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_mockStaffModelNull));
+            _ = _mockStaffDao.Setup(staffAdmin => staffAdmin.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(false));
             //Act
             var result = await _mockStaffController.UpdateStaffById(3, "Kris", "Remus", "5738086263", "Librarian", 4);
 

@@ -12,7 +12,7 @@ namespace LibraryAPI.Daos
         Task<StaffModel> GetStaffById(int Id);
         Task<IEnumerable<StaffModel>> DeleteStaffById(int Id);
         Task UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position);
-        Task <StaffModel>CheckStaffForAdmin(int Id);
+        Task <bool>CheckStaffForAdmin(int Id);
 
     }
     
