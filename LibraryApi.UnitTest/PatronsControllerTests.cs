@@ -151,13 +151,13 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest returns ok");
             _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_mockPatronModel));
             //Act
-            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
+            var result = await _mockPatronsController.UpdatePatronByEmail("Email", "James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408");
             //var resultMessage = (result as ObjectResult).Value;
             var resultStatusCode = result as OkObjectResult;
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result is OkObjectResult);
-            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.IsTrue(result is OkResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as OkResult).StatusCode);
         }
 
         [TestMethod]
@@ -167,7 +167,7 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest returns null message");
             _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMockNull));
             //Act
-            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
+            var result = await _mockPatronsController.UpdatePatronByEmail("Email","James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408");
             var resultMessage = (result as ObjectResult).Value;
             //Assert
             Assert.IsNotNull(result);
@@ -184,7 +184,7 @@ namespace LibraryApi.UnitTest
             _mockPatronDao.Setup(patron => patron.UpdatePatronByEmail(It.IsAny<PatronModel>())).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.UpdatePatronByEmail(_mockPatronModel);
+            var result = await _mockPatronsController.UpdatePatronByEmail("Email", "James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408");
             var resultMessage = (result as ObjectResult).Value;
             //Assert
             Assert.IsNotNull(result);

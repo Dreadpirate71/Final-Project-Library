@@ -117,24 +117,40 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod AddBookTest");
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
 
             //Act
-            var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
+            var result = await _booksControllerMock.AddBook(1, "C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001 );
             
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkResult);
         }
+        [TestMethod]
+        public async Task AddBookTest_UpdateBookRecord_ReturnsMessageWhenNotAdmin()
+        {
+            //Arrange
+            Console.WriteLine("Inside TestMethod AddBookTest Returns message for not Admin");
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(false));
 
+            //Act
+            var result = await _booksControllerMock.AddBook(1, "C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("You need to have an adminId to complete this task", (result as ObjectResult).Value);
+        }
         [TestMethod]
         public async Task AddBookTest_ThrowsException_ReturnsExceptionError()
         {
             //Arrange
             Console.WriteLine("Inside TestMethod AddBook throws exception");
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _bookDaoMock.Setup(book => book.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001)).Throws<Exception>();
 
             //Act
-            var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001);
+            var result = await _booksControllerMock.AddBook(1, "C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00, "In", "", 1001);
             
             //Assert
             Assert.IsNotNull(result);
@@ -191,7 +207,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest Returns 200");
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(arg => arg.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
 
             //Act
@@ -209,8 +225,8 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest Returns message for not Admin");
-            //_ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
-
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(false));
+            _ = _bookDaoMock.Setup(arg => arg.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(5, _bookModelMock);
 
@@ -225,7 +241,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod UpdateBookByTitleTest Returns message for null Book");
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
 
             //Act
             var result = await _booksControllerMock.UpdateBookByTitle(1,_bookModelMock);
@@ -241,7 +257,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod UpdateBookByTitle throws exception");
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(arg => arg.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
             _bookDaoMock.Setup(book => book.UpdateBookByTitle(_bookModelMock)).Throws<Exception>();
 
@@ -259,7 +275,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod DeleteBookByIdNull");
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             //Act
             var result = await _booksControllerMock.DeleteBookById(5, _bookModelMock.Id);
            
@@ -288,7 +304,7 @@ namespace LibraryApi.UnitTest
         {
             Console.WriteLine("Inside TestMethod DeleteBookByIdOk");
             //Arrange
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(arg => arg.DeleteBookById(It.IsAny<int>())).Returns(Task.FromResult<int>(1200));
             _ = _bookDaoMock.Setup(arg => arg.GetBookById(It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
             Console.WriteLine(_bookModelMock.Id);
@@ -307,7 +323,7 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod DeleteBookById throws exception");
-            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(_staffModelMock));
+            _ = _staffDaoMock.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(arg => arg.GetBookById(It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
             _bookDaoMock.Setup(book => book.DeleteBookById(1200)).Throws<Exception>();
 

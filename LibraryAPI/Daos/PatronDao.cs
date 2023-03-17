@@ -55,9 +55,10 @@ namespace LibraryAPI.Daos
         {
             var query = "UPDATE Patrons SET FirstName = @FirstName, LastName = @LastName," +
                         $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @PostalCode, PhoneNumber = @PhoneNumber" +
-                        $" WHERE Email = @Email";
+                        $" WHERE Id = @Id";
 
             var parameters = new DynamicParameters();
+            parameters.Add("@Id", updateRequest.Id, DbType.Int32);
             parameters.Add("@FirstName", updateRequest.FirstName, DbType.String);
             parameters.Add("@LastName", updateRequest.LastName, DbType.String);
             parameters.Add("@Email", updateRequest.Email, DbType.String);
@@ -116,7 +117,7 @@ namespace LibraryAPI.Daos
         {
             _sqlWrapper.QueryPatron<PatronModel>("UPDATE Patrons SET FirstName = @FirstName, LastName = @LastName," +
                                    $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @ PostalCode, PhoneNumber = @PhoneNumber" +
-                                   $"WHERE Email = @Email");
+                                   $"WHERE Id = @Id");
         }
         public void AddPatron()
         {
