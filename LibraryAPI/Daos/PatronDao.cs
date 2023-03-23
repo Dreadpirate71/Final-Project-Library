@@ -34,18 +34,18 @@ namespace LibraryAPI.Daos
             return patrons.ToList();
         }
 
-        public async Task<PatronModel> GetPatronById(int Id)
+        public async Task<PatronModel> GetPatronById(int id)
         {
-            var query = $"SELECT * FROM Patrons WHERE Id = '{Id}'";
+            var query = $"SELECT * FROM Patrons WHERE Id = '{id}'";
             using var connection = _dapperContext.CreateConnection();
             {
                 var patronById = await connection.QueryFirstOrDefaultAsync<PatronModel>(query);
                 return patronById;
             }
         }
-        public async Task<PatronModel> GetPatronByEmail(string Email)
+        public async Task<PatronModel> GetPatronByEmail(string email)
         {
-            var query = $"SELECT * FROM Patrons WHERE Email = '{Email}'";
+            var query = $"SELECT * FROM Patrons WHERE Email = '{email}'";
             using var connection = _dapperContext.CreateConnection();
 
             var patronByEmail = await connection.QueryFirstOrDefaultAsync<PatronModel>(query);

@@ -15,6 +15,7 @@ using static System.Reflection.Metadata.BlobBuilder;
 using Microsoft.AspNetCore.SignalR;
 using System.Runtime.CompilerServices;
 using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace LibraryAPI.Daos
 
@@ -32,17 +33,17 @@ namespace LibraryAPI.Daos
         {
             _context = context;
         }
-        public async Task AddStaff(string FirstName, string LastName, string PhoneNumber, string Position)
+        public async Task AddStaff(string firstName, string lastName, string phoneNumber, string position, string password)
         {
-            var query = "INSERT INTO Staff (FirstName, LastName, PhoneNumber, Position)" +
-                $"VALUES (@FirstName, @LastName, @PhoneNumber, @Position);";
+            var query = "INSERT INTO Staff (firstName, lastName, phoneNumber, position, password)" +
+                $"VALUES (@FirstName, @LastName, @PhoneNumber, @Position, @Password);";
 
             var parameters = new DynamicParameters();
-            parameters.Add("@FirstName", FirstName, DbType.String);
-            parameters.Add("@LastName", LastName, DbType.String);
-            parameters.Add("@PhoneNumber", PhoneNumber, DbType.String);
-            parameters.Add("@Position", Position, DbType.String);
-
+            parameters.Add("@FirstName", firstName, DbType.String);
+            parameters.Add("@LastName", lastName, DbType.String);
+            parameters.Add("@PhoneNumber", phoneNumber, DbType.String);
+            parameters.Add("@Position", position, DbType.String);
+            parameters.Add("@Password", password, DbType.String);
 
             using (var connection = _context.CreateConnection())
             {
@@ -58,9 +59,9 @@ namespace LibraryAPI.Daos
                 return staff.ToList();
             }
         }
-        public async Task<StaffModel> GetStaffById(int Id)
+        public async Task<StaffModel> GetStaffById(int id)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = '{Id}'";
+            var query = $"SELECT * FROM Staff WHERE Id = '{id}'";
             using (var connection = _context.CreateConnection())
             {
                 var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
@@ -68,29 +69,28 @@ namespace LibraryAPI.Daos
             }
         }
 
-        public async Task<IEnumerable<StaffModel>> DeleteStaffById(int Id)
+        public async Task<IEnumerable<StaffModel>> DeleteStaffById(int id)
         {
-            var query = $"DELETE FROM Staff WHERE Id = {Id}";
+            var query = $"DELETE FROM Staff WHERE Id = {id}";
             using (var connection = _context.CreateConnection())
             {
                 var staff = await connection.QueryAsync<StaffModel>(query);
                 return staff.ToList();
             }
         }
-        public async Task UpdateStaffById(int Id, string FirstName, string LastName, string PhoneNumber, string Position)
+        public async Task UpdateStaffById(StaffModel updateRequest)
         {
 
-            var query = "UPDATE Staff SET FirstName = @FirstName, LastName = @LastName, PhoneNumber = @PhoneNumber, " +
-                        $"Position =@Position WHERE Id = @Id;";
-
-
+            var query = "UPDATE Staff SET firstName = @FirstName, lastName = @LastName, phoneNumber = @PhoneNumber, " +
+                        $"position =@Position, password = @Password WHERE id = @Id;";
 
             var parameters = new DynamicParameters();
-            parameters.Add("@Id", Id, DbType.Int32);
-            parameters.Add("@FirstName", FirstName, DbType.String);
-            parameters.Add("@LastName", LastName, DbType.String);
-            parameters.Add("@PhoneNumber", PhoneNumber, DbType.String);
-            parameters.Add("@Position", Position, DbType.String);
+            parameters.Add("@Id", updateRequest.Id, DbType.Int32);
+            parameters.Add("@FirstName", updateRequest.FirstName, DbType.String);
+            parameters.Add("@LastName", updateRequest.LastName, DbType.String);
+            parameters.Add("@PhoneNumber", updateRequest.PhoneNumber, DbType.String);
+            parameters.Add("@Position", updateRequest.Position, DbType.String);
+            parameters.Add("@Password", updateRequest.Password, DbType.String);
 
 
             using (var connection = _context.CreateConnection())
@@ -99,9 +99,9 @@ namespace LibraryAPI.Daos
             }
            
         }
-        public async Task<bool> CheckStaffForAdmin(int Id)
+        public async Task<bool> CheckStaffForAdmin(int id, string password)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = {Id} AND position = 'Admin'";
+            var query = $"SELECT * FROM Staff WHERE Id = {id} AND position = 'Admin' AND Password = '{password}'";
 
             using (var connection = _context.CreateConnection())
             {
@@ -110,7 +110,6 @@ namespace LibraryAPI.Daos
                 {
                     return false;
                 }
-
                 return true;
             }
         }
