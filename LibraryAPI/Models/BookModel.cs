@@ -12,7 +12,7 @@ namespace LibraryAPI.Models
         public string Genre{ get; set; }
         public decimal Price{ get; set; }
         public string Status { get; set; } 
-        public string CheckOutDate { get; set; }
+        public Date CheckOutDate { get; set; }
         public int PatronId { get; set; }
 
         public string AddTitleName(string titleName)

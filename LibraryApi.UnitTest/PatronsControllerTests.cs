@@ -18,6 +18,7 @@ namespace LibraryApi.UnitTest
     public class PatronsControllerTests
     {
         private readonly Mock<IPatronDao> _mockPatronDao;
+        private readonly Mock<IStaffDao> _mockStaffDao;
         private readonly PatronsController _mockPatronsController;
         private readonly PatronModel _mockPatronModel;
         private IEnumerable<PatronModel> _patrons;
@@ -25,7 +26,8 @@ namespace LibraryApi.UnitTest
         public PatronsControllerTests()
         {
             _mockPatronDao = new Mock<IPatronDao>();
-            _mockPatronsController = new PatronsController(_mockPatronDao.Object);
+            _mockStaffDao = new Mock<IStaffDao>();
+            _mockPatronsController = new PatronsController(_mockPatronDao.Object, _mockStaffDao.Object);
             _mockPatronModel = new PatronModel() { Id = 1200, FirstName = "Jesus", LastName = "Christ", Email = "JesusLives@Heaven.com", StreetAddress = "1 Gold Street", City = "Clouds", State = "Joyous", PostalCode = "77777", PhoneNumber = "1234567890"};
             _patrons = new List<PatronModel>() { _mockPatronModel};
         }
@@ -47,8 +49,9 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside TestMethod GetListOfAllPatronsTest");
             _ = _mockPatronDao.Setup(patron => patron.GetListOfAllPatrons()).Returns(Task.FromResult(_patrons));
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             //Act
-            var result = await _mockPatronsController.GetListOfAllPatrons();
+            var result = await _mockPatronsController.GetListOfAllPatrons(1, "password");
             
             //Assert
             Assert.IsNotNull(result);
@@ -61,10 +64,11 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod GetListOfAllPatronsTest throws exception");
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(patron => patron.GetListOfAllPatrons()).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.GetListOfAllPatrons();
+            var result = await _mockPatronsController.GetListOfAllPatrons(1, "password");
             
             //Assert
             Assert.IsNotNull(result);
@@ -198,9 +202,10 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside Delete Patron 200 test");
             _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(patron => patron.DeletePatronById(It.IsAny<int>()));
             //Act
-            var result = await _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
+            var result = await _mockPatronsController.DeletePatronById(1, "password", _mockPatronModel.Id);
             //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
@@ -213,9 +218,11 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod DeletePatronById returns null message");
+            
             _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_patronModelMockNull));
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             //Act
-            var result = await _mockPatronsController.DeletePatronById(2000);
+            var result = await _mockPatronsController.DeletePatronById(1, "password", 5);
             //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
@@ -227,10 +234,11 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside TestMethod DeletePatronByIdTest throws exception");
             _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _mockPatronDao.Setup(patron => patron.DeletePatronById(It.IsAny<int>())).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.DeletePatronById(_mockPatronModel.Id);
+            var result = await _mockPatronsController.DeletePatronById(1, "password", _mockPatronModel.Id);
            
             //Assert
             Assert.IsNotNull(result);
