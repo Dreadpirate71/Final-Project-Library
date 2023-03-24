@@ -107,6 +107,85 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+        [HttpGet]
+        [Route("OverdueBooks")]
+        public async Task<IActionResult> GetOverdueBooks()
+        {
+            try
+            {
+                var book = await _bookDao.GetOverdueBooks();
+                if (book == null)
+                {
+                    return StatusCode(404, "No overdue books found");
+                }
+                return Ok(book);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("BooksCheckedOut/{patronEmail}")]
+        public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail)
+        {
+            try
+            {
+                var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                if (patron == null)
+                {
+                    return StatusCode(404, "Patron with that email does not exist!");
+                }
+                var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
+                if (patronBooksOut == null)
+                {
+                    return StatusCode(404, "Patron does not have any books currently checked out!");
+                }
+                return Ok(patronBooksOut);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("ListOfGenres")]
+        public async Task<IActionResult> GetListOfGenres()
+        {
+            try
+            {
+                var genres = await _bookDao.GetListOfGenres();
+                return Ok(genres);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("BookByGenre/{genre}")]
+
+        public async Task<IActionResult> GetBookByGenre([FromRoute] string genre)
+        {
+            try
+            {
+                var book = await _bookDao.GetBookByGenre(genre);
+                if (book == null)
+                {
+                    return StatusCode(404, "No books found with that Genre.");
+                }
+                return Ok(book);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
         [HttpPost]
         [Route("NewBook/{adminId}, {adminPassword}")]
         public async Task<IActionResult> AddBook([FromRoute] int adminId, [FromRoute] string adminPassword, string bookTitle, string authorFname, string authorLName, string genre, decimal price)
@@ -194,33 +273,7 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        [HttpDelete]
-        [Route("Book/{adminId}, {adminPassword}, {bookId}")]
-        public async Task<IActionResult>DeleteBookById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int bookId)
-        {
-            try
-            {
-                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
-                if (adminCheck == false)
-                {
-                    return StatusCode(404, "You need to have an adminId to complete this task");
-                }
-                else
-                {
-                    var book = await _bookDao.GetBookById(bookId);
-                    if (book == null)
-                    {
-                        return StatusCode(404, "No book found with that Id!");
-                    }
-                    await _bookDao.DeleteBookById(book.Id);
-                    return StatusCode(200);
-                }
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
+        
         [HttpPatch]
         [Route("CheckOutBook/{bookTitle}, {patronEmail}")]
         public async Task <IActionResult> CheckOutBook([FromRoute] string bookTitle, [FromRoute] string patronEmail)
@@ -286,74 +339,28 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        [HttpGet]
-        [Route("BooksCheckedOut/{patronEmail}")]
-        public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail)
-        {
-            try
-            {
-                var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                if (patron == null)
-                {
-                    return StatusCode(404, "Patron with that email does not exist!");
-                }
-                var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
-                if (patronBooksOut == null)
-                {
-                    return StatusCode(404, "Patron does not have any books currently checked out!");
-                }
-                return Ok(patronBooksOut);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-        [HttpGet]
-        [Route("OverdueBooks")]
-        public async Task<IActionResult> GetOverdueBooks()
-        {
-            try
-            {
-                var book = await _bookDao.GetOverdueBooks();
-                if (book == null)
-                {
-                    return StatusCode(404, "No overdue books found");
-                }
-                return Ok(book);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-        [HttpGet]
-        [Route("ListOfGenres")]
-        public async Task<IActionResult> GetListOfGenres()
-        {
-            try
-            {
-                var genres = await _bookDao.GetListOfGenres();
-                return Ok(genres);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-        [HttpGet]
-        [Route("BookByGenre/{genre}")]
 
-        public async Task<IActionResult> GetBookByGenre([FromRoute] string genre)
+        [HttpDelete]
+        [Route("Book/{adminId}, {adminPassword}, {bookId}")]
+        public async Task<IActionResult> DeleteBookById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int bookId)
         {
             try
             {
-                var book = await _bookDao.GetBookByGenre(genre);
-                if (book == null)
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
+                if (adminCheck == false)
                 {
-                    return StatusCode(404, "No books found with that Genre.");
+                    return StatusCode(404, "You need to have an adminId to complete this task");
                 }
-                return Ok(book);
+                else
+                {
+                    var book = await _bookDao.GetBookById(bookId);
+                    if (book == null)
+                    {
+                        return StatusCode(404, "No book found with that Id!");
+                    }
+                    await _bookDao.DeleteBookById(book.Id);
+                    return StatusCode(200);
+                }
             }
             catch (Exception e)
             {
@@ -437,11 +444,8 @@ namespace LibraryAPI.Controllers
         [Route("NewPatron/{email}")]
         public async Task<IActionResult> AddPatron(string firstName, string lastName, [FromRoute] string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
         {
-            //string patronEmail = new string(email);
-            //return Ok(patronEmail);
             try
             {
-                //var patron = await _patronDao.GetPatronByEmail(email);
                 var patronEmail = await _patronDao.CheckEmailUnique(email);
                 if (patronEmail == null)
                 {
@@ -567,6 +571,25 @@ namespace LibraryAPI.Controllers
             this._staffDao = _staffDao;
         }
 
+        [HttpGet]
+        [Route("Staff/{adminId}, {adminPassword}")]
+        public async Task<IActionResult> GetStaff([FromRoute] int adminId, [FromRoute] string adminPassword)
+        {
+            try
+            {
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
+                if (adminCheck == false)
+                {
+                    return StatusCode(404, "You do not have proper admin credentials!");
+                }
+                var staff = await _staffDao.GetStaff();
+                return Ok(staff);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
         [HttpPost]
         [Route("Staff")]
         public async Task<IActionResult> AddStaff(string firstName, string lastName, string phoneNumber, string position, string password, string confirmPassword)
@@ -585,55 +608,6 @@ namespace LibraryAPI.Controllers
                 }
             }
             
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("Staff/{adminId}, {adminPassword}")]
-        public async Task<IActionResult> GetStaff([FromRoute]int adminId, [FromRoute] string adminPassword)
-        {
-            try
-            {
-                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
-                if (adminCheck == false)
-                {
-                    return StatusCode(404, "You do not have proper admin credentials!");
-                }
-                var staff = await _staffDao.GetStaff();
-                return Ok(staff);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
-        [HttpDelete]
-        [Route("Staff/{adminId}, {adminPassword}, {staffId}")]
-        public async Task<IActionResult> DeleteStaffById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int staffId)
-        {
-            try
-            {
-                var staff = await _staffDao.GetStaffById(staffId);
-                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
-                if (staff == null)
-                {
-                    return StatusCode(404, "No staff with that Id.");
-                }
-                else if (adminCheck == false)
-                {
-                    return StatusCode(404, "You do not have proper admin credentials!");
-                }
-                else
-                {
-                    await _staffDao.DeleteStaffById(staffId);
-                    return StatusCode(200);
-                }
-
-            }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
@@ -685,6 +659,35 @@ namespace LibraryAPI.Controllers
                     await _staffDao.UpdateStaffById(updateStaff);
                     return StatusCode(200, "Staff member has been updated.");
                 }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("Staff/{adminId}, {adminPassword}, {staffId}")]
+        public async Task<IActionResult> DeleteStaffById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int staffId)
+        {
+            try
+            {
+                var staff = await _staffDao.GetStaffById(staffId);
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
+                if (staff == null)
+                {
+                    return StatusCode(404, "No staff with that Id.");
+                }
+                else if (adminCheck == false)
+                {
+                    return StatusCode(404, "You do not have proper admin credentials!");
+                }
+                else
+                {
+                    await _staffDao.DeleteStaffById(staffId);
+                    return StatusCode(200);
+                }
+
             }
             catch (Exception e)
             {
