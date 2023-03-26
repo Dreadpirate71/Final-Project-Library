@@ -6,14 +6,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.Reflection.Metadata.BlobBuilder;
+
 
 namespace LibraryAPI.Daos
 {
-        public class BookDao : IBookDao
+    public class BookDao : IBookDao
     {
         private readonly DapperContext _context;
         private readonly ISqlWrapper _sqlWrapper;
@@ -122,7 +123,7 @@ namespace LibraryAPI.Daos
         }
         public async Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId)
         {
-            var query = $"SELECT * FROM Books WHERE PatronId = '{patronId}'";
+            var query = $"SELECT * FROM Books WHERE PatronId = '{patronId}' AND Status = 'Out'";
             using var connection = _context.CreateConnection();
             var booksOut = await connection.QueryAsync<BookModel>(query);
             return booksOut.ToList();
@@ -134,6 +135,28 @@ namespace LibraryAPI.Daos
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
 
+        }
+        public async Task<BookModel> GetBookByTitleAndId(string bookTitle, int patronId)
+        {
+            var query = $"SELECT * FROM Books WHERE BookTitle = '{bookTitle}' AND PatronId= '{patronId}'";
+            using var connection = _context.CreateConnection();
+            var bookOut = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
+            return bookOut;
+
+        }
+        public async Task<IEnumerable<BookModel>> GetBookByGenre(string Genre)
+        {
+            var query = $"SELECT * FROM Books WHERE Genre = '{Genre}'";
+            using var connection = _context.CreateConnection();
+            var books = await connection.QueryAsync<BookModel>(query);
+            return books.ToList();
+        }
+        public async Task<IEnumerable<string>> GetListOfGenres()
+        {
+            var query = $"SELECT DISTINCT Genre FROM Books";
+            using var connection = _context.CreateConnection();
+            var genres = await connection.QueryAsync<string>(query);
+            return genres.ToList();
         }
         public void GetBook()
         {
@@ -157,20 +180,6 @@ namespace LibraryAPI.Daos
         public void DeleteBook()
         {
             _sqlWrapper.QueryBook<BookModel>("DELETE FROM Books WHERE Id = '{Id}'");
-        }
-        public async Task<IEnumerable<BookModel>> GetBookByGenre(string Genre)
-        {
-            var query = $"SELECT * FROM Books WHERE Genre = '{Genre}'";
-            using var connection = _context.CreateConnection();
-            var books = await connection.QueryAsync<BookModel>(query);
-            return books.ToList();
-        }
-        public async Task <IEnumerable<string>> GetListOfGenres()
-        {
-            var query = $"SELECT DISTINCT Genre FROM Books";
-            using var connection = _context.CreateConnection();
-            var genres = await connection.QueryAsync<string>(query);
-            return genres.ToList();
         }
     }
 }

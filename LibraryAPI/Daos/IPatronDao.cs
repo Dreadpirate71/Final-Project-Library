@@ -11,9 +11,10 @@ namespace LibraryAPI.Daos
         Task <PatronModel> GetPatronById(int id);
 
         Task <PatronModel> GetPatronByEmail(string email);
-        Task UpdatePatronByEmail(PatronModel patron);
-        Task AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber);
+        Task UpdatePatronById(PatronModel patron);
+        Task AddPatron(PatronModel newPatron);
         Task DeletePatronById(int id);
-        Task <dynamic>CheckEmailUnique(string email);
+        Task <bool>CheckEmailUnique(string email);
+        Task<bool> CheckPatronCredentials(string email, string password);
     }
 }

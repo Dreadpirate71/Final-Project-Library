@@ -1,12 +1,14 @@
 ﻿using Dapper;
 using LibraryAPI.Models;
 using LibraryAPI.Wrappers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using NUnit.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -51,40 +53,44 @@ namespace LibraryAPI.Daos
             var patronByEmail = await connection.QueryFirstOrDefaultAsync<PatronModel>(query);
             return patronByEmail;
         }
-        public async Task UpdatePatronByEmail(PatronModel updateRequest)
+        public async Task UpdatePatronById(PatronModel updatePatron)
         {
             var query = "UPDATE Patrons SET FirstName = @FirstName, LastName = @LastName," +
-                        $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @PostalCode, PhoneNumber = @PhoneNumber" +
-                        $" WHERE Id = @Id";
+                        $"Email = @Email, StreetAddress = @StreetAddress, City = @City, State = @State, PostalCode = @PostalCode, PhoneNumber = @PhoneNumber," +
+                        $"Password = @Password, AccountLock = @AccountLock WHERE Id = @Id";
 
             var parameters = new DynamicParameters();
-            parameters.Add("@Id", updateRequest.Id, DbType.Int32);
-            parameters.Add("@FirstName", updateRequest.FirstName, DbType.String);
-            parameters.Add("@LastName", updateRequest.LastName, DbType.String);
-            parameters.Add("@Email", updateRequest.Email, DbType.String);
-            parameters.Add("@StreetAddress", updateRequest.StreetAddress, DbType.String);
-            parameters.Add("@City", updateRequest.City, DbType.String);
-            parameters.Add("@State", updateRequest.State, DbType.String);
-            parameters.Add("@PostalCode", updateRequest.PostalCode, DbType.String);
-            parameters.Add("@PhoneNumber", updateRequest.PhoneNumber, DbType.String);
+            parameters.Add("@Id", updatePatron.Id, DbType.Int32);
+            parameters.Add("@FirstName", updatePatron.FirstName, DbType.String);
+            parameters.Add("@LastName", updatePatron.LastName, DbType.String);
+            parameters.Add("@Email", updatePatron.Email, DbType.String);
+            parameters.Add("@StreetAddress", updatePatron.StreetAddress, DbType.String);
+            parameters.Add("@City", updatePatron.City, DbType.String);
+            parameters.Add("@State", updatePatron.State, DbType.String);
+            parameters.Add("@PostalCode", updatePatron.PostalCode, DbType.String);
+            parameters.Add("@PhoneNumber", updatePatron.PhoneNumber, DbType.String);
+            parameters.Add("@Password", updatePatron.Password, DbType.String);
+            parameters.Add("@AccountLock", updatePatron.AccountLock, DbType.String);
 
             using var connection = _dapperContext.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
         }
 
-        public async Task AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
+        public async Task AddPatron(PatronModel newPatron)
         {
-            var query = "INSERT INTO Patrons (FirstName, LastName, Email, StreetAddress, City, State, PostalCode, PhoneNumber)" +
-                $"VALUES (@FirstName, @LastName, @Email, @StreetAddress, @PostalCode, @State, @PostalCode, @PhoneNumber)";
+            var query = "INSERT INTO Patrons (FirstName, LastName, Email, StreetAddress, City, State, PostalCode, PhoneNumber, Password, AccountLock)" +
+                $"VALUES (@FirstName, @LastName, @Email, @StreetAddress, @City, @State, @PostalCode, @PhoneNumber, @Password, @AccountLock)";
             var parameters = new DynamicParameters();
-            parameters.Add("@FirstName", firstName, DbType.String);
-            parameters.Add("@LastName", lastName, DbType.String);
-            parameters.Add("@Email", email, DbType.String);
-            parameters.Add("@StreetAddress", streetAddress, DbType.String);
-            parameters.Add("@City", city, DbType.String);
-            parameters.Add("@State", state, DbType.String);
-            parameters.Add("@PostalCode", postalCode, DbType.String);
-            parameters.Add("@PhoneNumber", phoneNumber, DbType.String);
+            parameters.Add("@FirstName", newPatron.FirstName, DbType.String);
+            parameters.Add("@LastName", newPatron.LastName, DbType.String);
+            parameters.Add("@Email", newPatron.Email, DbType.String);
+            parameters.Add("@StreetAddress", newPatron.StreetAddress, DbType.String);
+            parameters.Add("@City", newPatron.City, DbType.String);
+            parameters.Add("@State", newPatron.State, DbType.String);
+            parameters.Add("@PostalCode", newPatron.PostalCode, DbType.String);
+            parameters.Add("@PhoneNumber", newPatron.PhoneNumber, DbType.String);
+            parameters.Add("@Password", newPatron.Password, DbType.String);
+            parameters.Add("@AccountLock", newPatron.AccountLock, DbType.String);
 
             using var connection = _dapperContext.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
@@ -99,13 +105,29 @@ namespace LibraryAPI.Daos
             }
         }
 
-        public async Task<dynamic> CheckEmailUnique(string email)
+        public async Task<bool> CheckEmailUnique(string email)
         {
             var query = $"SELECT Email FROM Patrons WHERE Email = '{email}'";
             using var connection = _dapperContext.CreateConnection();
             {
                 var patronEmail = await connection.QueryFirstOrDefaultAsync(query);
-                return patronEmail;
+                if (patronEmail == null)
+                { return true; }
+                else 
+                { return false; }
+            }
+        }
+
+        public async Task<bool> CheckPatronCredentials(string email, string password)
+        {
+            var query = $"SELECT * FROM Patrons WHERE Email = '{email}' AND Password = '{password}'";
+            using var connection = _dapperContext.CreateConnection();
+            {
+                var patronCheck = await connection.QueryFirstOrDefaultAsync(query);
+                if (patronCheck != null)
+                { return true; }
+                else
+                { return false; }
             }
         }
 
