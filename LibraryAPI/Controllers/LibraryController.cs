@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -128,22 +129,30 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet]
-        [Route("BooksCheckedOut/{patronEmail}")]
-        public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail)
+        [Route("BooksCheckedOut/{patronEmail}, {patronPassword}")]
+        public async Task<IActionResult> GetBooksCheckedOutByPatron([FromRoute] string patronEmail, [FromRoute]string patronPassword)
         {
             try
             {
-                var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                if (patron == null)
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
                 {
-                    return StatusCode(404, "Patron with that email does not exist!");
+                    return StatusCode(404, "Patron with that email and password does not exist!");
                 }
-                var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
-                if (patronBooksOut == null)
+                else
                 {
-                    return StatusCode(404, "Patron does not have any books currently checked out!");
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    if (patron == null)
+                    {
+                        return StatusCode(404, "Patron with that email does not exist!");
+                    }
+                    var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
+                    if (patronBooksOut == null)
+                    {
+                        return StatusCode(404, "Patron does not have any books currently checked out!");
+                    }
+                    return Ok(patronBooksOut);
                 }
-                return Ok(patronBooksOut);
             }
             catch (Exception e)
             {
@@ -186,6 +195,20 @@ namespace LibraryAPI.Controllers
             }
         }
 
+        public IBookDao Get_bookDao()
+        {
+            return _bookDao;
+        }
+
+        [HttpGet]
+        [Route("NewYorkTimesBestSellers")]
+        public async Task<IActionResult> GetNYTBestSellers()
+        {
+            var bookModel = new BookModel();
+            await Task.Run(() => { bookModel.OpenUrl("https://www.nytimes.com/books/best-sellers/"); } );
+            return Ok();
+           
+        }
         [HttpPost]
         [Route("NewBook/{adminId}, {adminPassword}")]
         public async Task<IActionResult> AddBook([FromRoute] int adminId, [FromRoute] string adminPassword, string bookTitle, string authorFname, string authorLName, string genre, decimal price)
@@ -230,7 +253,7 @@ namespace LibraryAPI.Controllers
                     }
                     else
                     {
-                        //var updateBook = new BookModel();
+                        
                         updateBook.Id = book.Id;
                         if (updateBookTitle == null)
                         { updateBook.BookTitle = book.BookTitle; }
@@ -261,8 +284,6 @@ namespace LibraryAPI.Controllers
                         updateBook.CheckOutDate = book.CheckOutDate;
                         updateBook.PatronId = book.PatronId;  
                         
-                        /*await _bookDao.UpdateBookById(updateBook);
-                        return StatusCode(200, "Book has been updated!");*/
                     }
                     await _bookDao.UpdateBookById(updateBook);
                     return StatusCode(200, "Book has been updated!");
@@ -275,37 +296,42 @@ namespace LibraryAPI.Controllers
         }
         
         [HttpPatch]
-        [Route("CheckOutBook/{bookTitle}, {patronEmail}")]
-        public async Task <IActionResult> CheckOutBook([FromRoute] string bookTitle, [FromRoute] string patronEmail)
+        [Route("CheckOutBook/{bookTitle}, {patronEmail}, {patronPassword}")]
+        public async Task <IActionResult> CheckOutBook([FromRoute] string bookTitle, [FromRoute] string patronEmail, [FromRoute]string patronPassword)
         {
              
             try
             {
-                var book = await _bookDao.GetBookByTitle(bookTitle);
-                var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                if (book == null) 
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
                 {
-                    return StatusCode(404, "Book with this title does not exist!");
-                } 
-                if (patron == null)
-                {
-                    return StatusCode(404, "Patron with this email does not exist!");
+                    return StatusCode(404, "Patron with that email and password does not exist!");
                 }
-                var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
-                if (patronBooksOut >= 5)
+                else
                 {
-                    return StatusCode(500, "Exceeded maximum of 5 books checked out! Please return a book to proceed.");
+                    var book = await _bookDao.GetBookByTitle(bookTitle);
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    if (book == null)
+                    {
+                        return StatusCode(404, "Book with this title does not exist!");
+                    }
+                    
+                    var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
+                    if (patronBooksOut >= 5)
+                    {
+                        return StatusCode(500, "Exceeded maximum of 5 books checked out! Please return a book to proceed.");
+                    }
+                    else if (book.Status == "Out")
+                    {
+                        return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out.");
+                    }
+                    book.Status = "Out";
+                    book.PatronId = patron.Id;
+                    var checkOutDate = DateTime.Now;
+                    book.CheckOutDate = checkOutDate;
+                    await _bookDao.UpdateBookById(book);
+                    return StatusCode(200);
                 }
-                else if (book.Status == "Out")
-                {
-                    return StatusCode(500, "Book Status = 'Out'. Please choose a book that is not already checked out.");
-                }
-                book.Status = "Out";
-                book.PatronId = patron.Id;
-                var checkOutDate = DateTime.Now;
-                book.CheckOutDate = checkOutDate;
-                await _bookDao.UpdateBookById(book);
-                return StatusCode(200);
             }
             catch (Exception e)
             {
@@ -313,26 +339,31 @@ namespace LibraryAPI.Controllers
             } 
         }
         [HttpPatch]
-        [Route("ReturnBook/{patronEmail}, {bookTitle}")]
+        [Route("ReturnBook/{patronEmail}, {patronPassword}, {bookTitle}")]
 
-        public async Task<IActionResult> ReturnBook([FromRoute] string patronEmail, [FromRoute] string bookTitle)
+        public async Task<IActionResult> ReturnBook([FromRoute] string patronEmail, [FromRoute]string patronPassword, [FromRoute] string bookTitle)
         {
             try
             {
-                var book = await _bookDao.GetBookByTitle(bookTitle);
-                var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                if (book == null)
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
                 {
-                    return StatusCode(404, "No book found with that title!");
+                    return StatusCode(404, "Patron with that email and password does not exist!");
                 }
-                if (patron == null)
+                else
                 {
-                    return StatusCode(404, "Patron with that email does not exist!");
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    var book = await _bookDao.GetBookByTitleAndId(bookTitle, patron.Id);
+                    if (book == null)
+                    {
+                        return StatusCode(404, "No book checked out with that title!");
+                    }
+
+                    book.PatronId = 1003;
+                    book.Status = "In";
+                    await _bookDao.UpdateBookById(book);
+                    return StatusCode(200, "Book has been returned.");
                 }
-                book.PatronId = 1003;
-                book.Status = "In";
-                await _bookDao.UpdateBookById(book);
-                return StatusCode(200);
             }
             catch (Exception e)
             {
@@ -403,17 +434,25 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet]
-        [Route("PatronById/{id}")]
-        public async Task<IActionResult> GetPatronById([FromRoute] int id)
+        [Route("PatronById/{adminId}, {adminPassword}, {patronId}")]
+        public async Task<IActionResult> GetPatronById([FromRoute]int adminId, [FromRoute]string adminPassword, [FromRoute] int patronId)
         {
             try
             {
-                var patron = await _patronDao.GetPatronById(id);
-                if (patron == null)
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
+                if (adminCheck == false)
                 {
-                    return StatusCode(404, "Patron with that Id number does not exist!");
+                    return StatusCode(404, "You do not have proper admin credentials!");
                 }
-                return Ok(patron);
+                else
+                {
+                    var patron = await _patronDao.GetPatronById(patronId);
+                    if (patron == null)
+                    {
+                        return StatusCode(404, "Patron with that Id number does not exist!");
+                    }
+                    return Ok(patron);
+                }
             }
             catch (Exception e)
             {
@@ -422,17 +461,25 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet]
-        [Route("PatronByEmail/{email}")]
-        public async Task<IActionResult> GetPatronByEmail([FromRoute] string email)
+        [Route("PatronByEmail/{patronEmail}, {patronPassword}")]
+        public async Task<IActionResult> GetPatronByEmail([FromRoute] string patronEmail, [FromRoute]string patronPassword)
         {
             try
             {
-                var patron = await _patronDao.GetPatronByEmail(email);
-                if (patron == null)
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
                 {
-                    return StatusCode(404, "Patron with that email does not exist!");
+                    return StatusCode(404, "Patron with that email and password does not exist!");
                 }
-                return Ok(patron);
+                else
+                {
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    if (patron == null)
+                    {
+                        return StatusCode(404, "Patron with that email does not exist!");
+                    }
+                    return Ok(patron);
+                }
             }
             catch (Exception e)
             {
@@ -441,21 +488,34 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost]
-        [Route("NewPatron/{email}")]
-        public async Task<IActionResult> AddPatron(string firstName, string lastName, [FromRoute] string email, string streetAddress, string city, string state, string postalCode, string phoneNumber)
+        [Route("NewPatron")]
+        public async Task<IActionResult> AddPatron(string firstName, string lastName, string email, string streetAddress, string city, string state, string postalCode, string phoneNumber, string password, string confirmPassword)
         {
             try
             {
-                var patronEmail = await _patronDao.CheckEmailUnique(email);
-                if (patronEmail == null)
+                var newPatron = new PatronModel();
+                var emailUnique = await _patronDao.CheckEmailUnique(email);
+                if (emailUnique == true)
                 {
-                    await _patronDao.AddPatron(firstName, lastName, email, streetAddress, city, state, postalCode, phoneNumber);
-                    return Ok();
+                    if (password == confirmPassword)
+                    {
+                        newPatron.FirstName = firstName;
+                        newPatron.LastName = lastName;
+                        newPatron.Email = email;
+                        newPatron.StreetAddress = streetAddress;
+                        newPatron.City = city;
+                        newPatron.State = state;
+                        newPatron.PostalCode = postalCode;
+                        newPatron.PhoneNumber = phoneNumber;
+                        newPatron.Password = password;
+                        newPatron.AccountLock = "No";
+                        await _patronDao.AddPatron(newPatron);
+                        return Ok("New Patron created.");
+                    }
+                    else { return StatusCode(400, "Passwords entered do not match!"); }
                 }
                 else
-                {
-                    return StatusCode(400, "That email is already in use. Please use a different email.");
-                }
+                {return StatusCode(400, "That email is already in use. Please use a different email.");}
             }
             catch(Exception e)
             {
@@ -465,70 +525,87 @@ namespace LibraryAPI.Controllers
         }
         
         [HttpPatch]
-        [Route("UpdatePatron/{email}")]
-        public async Task<IActionResult> UpdatePatronByEmail([FromRoute]string email, string firstName, string lastName, string updateEmail, string streetAddress, string city, string state, string postalCode, string phoneNumber)
+        [Route("UpdatePatron/{email}, {password}")]
+        public async Task<IActionResult> UpdatePatronByEmail([FromRoute]string email, [FromRoute] string password,string updateFirstName, string updateLastName, 
+                                                                string updateEmail, string updateStreetAddress, string updateCity, string updateState, string updatePostalCode, 
+                                                                string updatePhoneNumber, string updatePassword, string updateConfirmPassword)
         {
             var updatePatron = new PatronModel();
             try
             {
-                var patron = await _patronDao.GetPatronByEmail(email);
-                if (patron == null)
+                var checkCredentials = await _patronDao.CheckPatronCredentials(email, password);
+                if (checkCredentials == false)
                 {
-                    return StatusCode(404, "Patron with that email does not exist!");
+                    return StatusCode(404, "Patron with that email and password does not exist!");
                 }
-                updatePatron.Id = patron.Id;
-
-                if (firstName == null)
-                {updatePatron.FirstName = patron.FirstName;}
-                else
-                {updatePatron.FirstName = firstName;}
-
-                if (lastName == null)
-                {updatePatron.LastName = patron.LastName;}
-                else
-                {updatePatron.LastName = lastName;}
-
-                if (updateEmail == null)
-                {updatePatron.Email = patron.Email;}
                 else
                 {
-                    var patronEmail = await _patronDao.CheckEmailUnique(updateEmail);
-                    if (patronEmail == null)
-                    {
-                        updatePatron.Email = updateEmail;
-                    }
+                    var patron = await _patronDao.GetPatronByEmail(email);
+
+                    updatePatron.Id = patron.Id;
+
+                    if (updateFirstName == null)
+                    { updatePatron.FirstName = patron.FirstName; }
+                    else
+                    { updatePatron.FirstName = updateFirstName; }
+
+                    if (updateLastName == null)
+                    { updatePatron.LastName = patron.LastName; }
+                    else
+                    { updatePatron.LastName = updateLastName; }
+
+                    if (updateEmail == null)
+                    { updatePatron.Email = patron.Email; }
                     else
                     {
-                        return StatusCode(400, "That email is already in use. Please use a different email.");
+                        var emailUnique = await _patronDao.CheckEmailUnique(updateEmail);
+                        if (emailUnique == true)
+                        {
+                            updatePatron.Email = updateEmail;
+                        }
+                        else
+                        {
+                            return StatusCode(400, "That email is already in use. Please use a different email.");
+                        }
                     }
+                    if (updateStreetAddress == null)
+                    { updatePatron.StreetAddress = patron.StreetAddress; }
+                    else
+                    { updatePatron.StreetAddress = updateStreetAddress; }
+
+                    if (updateCity == null)
+                    { updatePatron.City = patron.City; }
+                    else
+                    { updatePatron.City = updateCity; }
+
+                    if (updateState == null)
+                    { updatePatron.State = patron.State; }
+                    else
+                    { updatePatron.State = updateState; }
+
+                    if (updatePostalCode == null)
+                    { updatePatron.PostalCode = patron.PostalCode; }
+                    else
+                    { updatePatron.PostalCode = updatePostalCode; }
+
+                    if (updatePhoneNumber == null)
+                    { updatePatron.PhoneNumber = patron.PhoneNumber; }
+                    else
+                    { updatePatron.PhoneNumber = updatePhoneNumber; }
+                    if (updatePassword == null)
+                    { updatePatron.Password = patron.Password; }
+                    else
+                    {
+                        if (updatePassword == updateConfirmPassword)
+                        { updatePatron.Password = updatePassword; }
+                        else
+                        { return StatusCode(400, "Passwords entered do not match!"); }
+                    }
+                    updatePatron.AccountLock = patron.AccountLock;
+
+                    await _patronDao.UpdatePatronById(updatePatron);
+                    return Ok("Patron has been updated!");
                 }
-                if (streetAddress == null)
-                {updatePatron.StreetAddress = patron.StreetAddress;}
-                else
-                {updatePatron.StreetAddress = streetAddress;}
-
-                if (city == null)
-                {updatePatron.City = patron.City;}
-                else
-                {updatePatron.City = city;}
-
-                if (state == null)
-                {updatePatron.State = patron.State;}
-                else
-                {updatePatron.State = state;}
-
-                if (postalCode == null)
-                {updatePatron.PostalCode = patron.PostalCode;}
-                else
-                {updatePatron.PostalCode = postalCode;}
-
-                if (phoneNumber == null)
-                {updatePatron.PhoneNumber = patron.PhoneNumber;}
-                else
-                {updatePatron.PhoneNumber = phoneNumber;}
-
-                await _patronDao.UpdatePatronByEmail(updatePatron);
-                return Ok();
             }
             catch (Exception e)
             {
@@ -552,7 +629,7 @@ namespace LibraryAPI.Controllers
                 else
                 {
                     await _patronDao.DeletePatronById(patron.Id);
-                    return StatusCode(200);
+                    return StatusCode(200, "Patron has been deleted.");
                 }
             }
             catch (Exception e)
@@ -685,7 +762,7 @@ namespace LibraryAPI.Controllers
                 else
                 {
                     await _staffDao.DeleteStaffById(staffId);
-                    return StatusCode(200);
+                    return StatusCode(200, "Staff member has been deleted.");
                 }
 
             }

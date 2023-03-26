@@ -24,7 +24,7 @@ namespace LibraryAPI.Daos
         Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks();
         Task<IEnumerable<string>> GetListOfGenres();
         Task <IEnumerable<BookModel>>GetOverdueBooks();
-
+        Task <BookModel>GetBookByTitleAndId(string bookTitle, int patronId);
 
     }
 }

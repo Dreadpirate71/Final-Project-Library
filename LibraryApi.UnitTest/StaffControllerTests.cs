@@ -113,8 +113,8 @@ namespace LibraryApi.UnitTest
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
-            Assert.AreEqual(StatusCodes.Status200OK, (result as StatusCodeResult).StatusCode);
+            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.AreEqual("Staff member has been deleted.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
