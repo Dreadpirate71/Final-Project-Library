@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
+using System.Globalization;
 
 namespace LibraryApi.UnitTest
 {
@@ -19,19 +20,22 @@ namespace LibraryApi.UnitTest
     {
         private readonly Mock<IPatronDao> _mockPatronDao;
         private readonly Mock<IStaffDao> _mockStaffDao;
+        private readonly Mock<PatronModel> _mockPatronModel;
         private readonly PatronsController _mockPatronsController;
-        private readonly PatronModel _mockPatronModel;
+        private readonly PatronModel _patronModel;
         private readonly StaffModel _mockStaffModel;
         private IEnumerable<PatronModel> _patrons;
         private PatronModel? _patronModelMockNull;
         public PatronsControllerTests()
         {
+
             _mockPatronDao = new Mock<IPatronDao>();
             _mockStaffDao = new Mock<IStaffDao>();
+            _mockPatronModel = new Mock<PatronModel>();
             _mockPatronsController = new PatronsController(_mockPatronDao.Object, _mockStaffDao.Object);
-            _mockPatronModel = new PatronModel() { Id = 1200, FirstName = "Jesus", LastName = "Christ", Email = "JesusLives@Heaven.com", StreetAddress = "1 Gold Street", City = "Clouds", 
+            _patronModel = new PatronModel() { Id = 1200, FirstName = "Jesus", LastName = "Christ", Email = "JesusLives@Heaven.com", StreetAddress = "1 Gold Street", City = "Clouds", 
                                                   State = "Joyous", PostalCode = "77777", PhoneNumber = "1234567890", Password = "HeLives!", AccountLock = "No" };
-            _patrons = new List<PatronModel>() { _mockPatronModel};
+            _patrons = new List<PatronModel>() { _patronModel };
             _mockStaffModel = new StaffModel() { Id = 1103, FirstName = "James", LastName = "Remus", PhoneNumber = "5738087408", Position = "Admin", Password = "IMAdmin!" };
         }
 
@@ -110,14 +114,60 @@ namespace LibraryApi.UnitTest
         }
 
         [TestMethod]
+        [DataRow("123@1456523")]
+        [DataRow("[253]2305")]
+        [DataRow("J25364589")]
+        public void CheckPhoneNumberTest_RunCheck_ReturnsMessageWhenFalse(string phoneNumber)
+        {
+            //Arrange
+            Console.WriteLine("Inside CheckPhoneTest False");
+            //Act
+            var result = _patronModel.CheckPhoneNumber(phoneNumber);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is bool);
+            Assert.AreEqual(false, result);
+        }
+
+        [TestMethod]
+        [DataRow("1Kris.yahoo.com")]
+        [DataRow("u@yahoocom")]
+        public void IsValidEmailRegEx_RunCheck_ReturnsMessageWhenFalse(string email)
+        {
+            //Arrange
+            Console.WriteLine("Inside Valid Email Returns False and message.");
+            //Act
+            var result = _patronModel.IsValidEmailRegEx(email);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(false, result);
+        }
+        
+        [TestMethod]
+        public async Task AddPatronTest_RunCheckPhone_ReturnsMessageWhenFalse()
+        {
+            //Arrange 
+            Console.WriteLine("Inside AddPatronTest check phone returns message when false.");
+            _ = _mockPatronDao.Setup(email => email.CheckEmailUnique(It.IsAny<string>())).Returns(Task.FromResult(true));
+
+            //Act
+            var result = await _mockPatronsController.AddPatron("James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "123@1234568", "Password", "Password");
+          
+            //Assert
+            Assert.IsNotNull (result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("The phone number entered is not valid!", (result as ObjectResult).Value);
+        }
+        [TestMethod]
         public async Task GetPatronByEmailTest_RunsQuery_ReturnsOkObjectWhenSuccessful()
         {
             //Arrange
             Console.WriteLine("Inside TestMethod GetPatronByEmaiTest Returns Ok");
             _ = _mockPatronDao.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModel));
             //Act
-            var result = await _mockPatronsController.GetPatronByEmail(_mockPatronModel.Email, _mockPatronModel.Password) as OkObjectResult;
+            var result = await _mockPatronsController.GetPatronByEmail(_patronModel.Email, _patronModel.Password) as OkObjectResult;
             
             //Assert
             Assert.IsNotNull(result);
@@ -149,7 +199,7 @@ namespace LibraryApi.UnitTest
             _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.GetPatronByEmail(_mockPatronModel.Email, _mockPatronModel.Password);
+            var result = await _mockPatronsController.GetPatronByEmail(_patronModel.Email, _patronModel.Password);
             var resultMessage = (result as ObjectResult).Value;
             //Assert
             Assert.IsNotNull(result);
@@ -163,8 +213,8 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest returns ok");
             _ = _mockPatronDao.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(email => email.CheckEmailUnique(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _ = _mockPatronDao.Setup(update => update.UpdatePatronById(It.IsAny<PatronModel>())).Returns(Task.FromResult(_mockPatronModel));
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(update => update.UpdatePatronById(It.IsAny<PatronModel>())).Returns(Task.FromResult(_patronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModel));
             //Act
             var result = await _mockPatronsController.UpdatePatronByEmail("Email", "patronPassword", "James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408", "password", "password");
             //var resultMessage = (result as ObjectResult).Value;
@@ -182,7 +232,7 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest returns null message");
             _ = _mockPatronDao.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(false));
             _ = _mockPatronDao.Setup(email => email.CheckEmailUnique(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _ = _mockPatronDao.Setup(update => update.UpdatePatronById(It.IsAny<PatronModel>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(update => update.UpdatePatronById(It.IsAny<PatronModel>())).Returns(Task.FromResult(_patronModel));
             _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMockNull));
             //Act
             var result = await _mockPatronsController.UpdatePatronByEmail("Email", "patronPassword", "James", "Remus", "James.Remus@vu.com", "308 Devine Ct.", "Columbia", "MO", "65203", "5738087408", "password", "password");
@@ -200,7 +250,7 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside TestMethod UpdatePatronByEmailTest throws exception");
             _ = _mockPatronDao.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(email => email.CheckEmailUnique(It.IsAny<string>())).Returns(Task.FromResult(true));
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModel));
             _mockPatronDao.Setup(patron => patron.UpdatePatronById(It.IsAny<PatronModel>())).Throws<Exception>();
 
             //Act
@@ -217,11 +267,11 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside Delete Patron 200 test");
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_patronModel));
             _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(patron => patron.DeletePatronById(It.IsAny<int>()));
             //Act
-            var result = await _mockPatronsController.DeletePatronById(1, "password", _mockPatronModel.Id);
+            var result = await _mockPatronsController.DeletePatronById(1, "password", _patronModel.Id);
             //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
@@ -249,12 +299,12 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside TestMethod DeletePatronByIdTest throws exception");
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_patronModel));
             _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _mockPatronDao.Setup(patron => patron.DeletePatronById(It.IsAny<int>())).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.DeletePatronById(1, "password", _mockPatronModel.Id);
+            var result = await _mockPatronsController.DeletePatronById(1, "password", _patronModel.Id);
            
             //Assert
             Assert.IsNotNull(result);
@@ -267,9 +317,9 @@ namespace LibraryApi.UnitTest
             //Arrange
             Console.WriteLine("Inside GetPatronByIdTest returns Ok result");
             _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_mockPatronModel));
+            _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_patronModel));
             //Act
-            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _mockPatronModel.Id);
+            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _patronModel.Id);
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is OkObjectResult);
@@ -284,7 +334,7 @@ namespace LibraryApi.UnitTest
             _ = _mockStaffDao.Setup(staff => staff.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Returns(Task.FromResult(_patronModelMockNull));
             //Act
-            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _mockPatronModel.Id);
+            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _patronModel.Id);
             //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
@@ -300,7 +350,7 @@ namespace LibraryApi.UnitTest
             _mockPatronDao.Setup(patron => patron.GetPatronById(It.IsAny<int>())).Throws<Exception>();
 
             //Act
-            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _mockPatronModel.Id);
+            var result = await _mockPatronsController.GetPatronById(_mockStaffModel.Id, _mockStaffModel.Password, _patronModel.Id);
 
             //Assert
             Assert.IsNotNull(result);
