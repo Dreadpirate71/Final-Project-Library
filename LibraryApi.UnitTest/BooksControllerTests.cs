@@ -613,5 +613,81 @@ namespace LibraryApi.UnitTest
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
         }
+
+        [TestMethod]
+        public async Task AddBookToWaitListTest_ExecuteQuery_ReturnsSuccessCodeWithMesssage()
+        {
+            //Arrange 
+            Console.WriteLine("Inside AddBookToWaitListTest returns success message.");
+            _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookModelMock.Status = "Out";
+
+            //Act
+            var result = await _booksControllerMock.AddBookToWaitList("patronEmail", "password", "bookTitle");
+
+            //Assert
+            Assert.IsNotNull(_bookDaoMock.Object);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Book has been added to waitlist.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task AddBookToWaitListTest_RunMethod_ReturnsErrorMesssageWhenBookIsIn()
+        {
+            //Arrange 
+            Console.WriteLine("Inside AddBookToWaitListTest returns success message.");
+            _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookModelMock.Status = "In";
+
+            //Act
+            var result = await _booksControllerMock.AddBookToWaitList("patronEmail", "password", "bookTitle");
+
+            //Assert
+            Assert.IsNotNull(_bookDaoMock.Object);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("This book is available to check out.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task AddBookToWaitListTest_RunMethod_ReturnsErrorMesssagePatronCredentialsFalse()
+        {
+            //Arrange 
+            Console.WriteLine("Inside AddBookToWaitListTest returns success message.");
+            _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(false));
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookModelMock.Status = "Out";
+
+            //Act
+            var result = await _booksControllerMock.AddBookToWaitList("patronEmail", "password", "bookTitle");
+
+            //Assert
+            Assert.IsNotNull(_bookDaoMock.Object);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Patron with that email and password does not exist!", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task AddBookToWaitListTest_RunMethod_ReturnsErrorMesssageBookTitleIsNull()
+        {
+            //Arrange 
+            Console.WriteLine("Inside AddBookToWaitListTest returns success message.");
+            _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMockNull));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookModelMock.Status = "Out";
+
+            //Act
+            var result = await _booksControllerMock.AddBookToWaitList("patronEmail", "password", "bookTitle");
+
+            //Assert
+            Assert.IsNotNull(_bookDaoMock.Object);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual("Book with this title does not exist!", (result as ObjectResult).Value);
+        }
     }
 }

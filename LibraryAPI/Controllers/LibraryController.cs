@@ -370,7 +370,40 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-
+        [HttpPatch]
+        [Route("BookWaitList/{patronEmail}, {patronPassword}")]
+        public async Task<IActionResult> AddBookToWaitList([FromRoute] string patronEmail, [FromRoute] string patronPassword, string bookTitle)
+        {
+            try
+            {
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
+                {
+                    return StatusCode(404, "Patron with that email and password does not exist!");
+                }
+                else
+                {
+                    var book = await _bookDao.GetBookByTitle(bookTitle);
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    if (book == null)
+                    {
+                        return StatusCode(404, "Book with this title does not exist!");
+                    }
+                    else if (book.Status == "In")
+                    {
+                        return StatusCode(400, "This book is available to check out.");}
+                    else
+                    {
+                        var waitBook = _bookDao.BookWaitList(patron.Id, book.BookTitle, book.AuthorFName, book.AuthorLName);
+                        return StatusCode(200, "Book has been added to waitlist.");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
         [HttpDelete]
         [Route("Book/{adminId}, {adminPassword}, {bookId}")]
         public async Task<IActionResult> DeleteBookById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int bookId)
@@ -403,6 +436,7 @@ namespace LibraryAPI.Controllers
     {
         private readonly IPatronDao _patronDao;
         private readonly IStaffDao _staffDao;
+        private readonly PatronModel _patronModel;
         
         public PatronsController(IPatronDao patronDao, IStaffDao staffDao)
         {
@@ -494,28 +528,37 @@ namespace LibraryAPI.Controllers
             try
             {
                 var newPatron = new PatronModel();
-                var emailUnique = await _patronDao.CheckEmailUnique(email);
-                if (emailUnique == true)
-                {
-                    if (password == confirmPassword)
-                    {
-                        newPatron.FirstName = firstName;
-                        newPatron.LastName = lastName;
-                        newPatron.Email = email;
-                        newPatron.StreetAddress = streetAddress;
-                        newPatron.City = city;
-                        newPatron.State = state;
-                        newPatron.PostalCode = postalCode;
-                        newPatron.PhoneNumber = phoneNumber;
-                        newPatron.Password = password;
-                        newPatron.AccountLock = "No";
-                        await _patronDao.AddPatron(newPatron);
-                        return Ok("New Patron created.");
-                    }
-                    else { return StatusCode(400, "Passwords entered do not match!"); }
-                }
+                if (!newPatron.IsValidEmailRegEx(email))
+                { return StatusCode(400, "Please enter a valid email address!"); }
                 else
-                {return StatusCode(400, "That email is already in use. Please use a different email.");}
+                {
+                    var emailUnique = await _patronDao.CheckEmailUnique(email);
+                    if (emailUnique == true)
+                    {
+                        if (password == confirmPassword)
+                        {
+                            newPatron.FirstName = firstName;
+                            newPatron.LastName = lastName;
+                            newPatron.Email = email;
+                            newPatron.StreetAddress = streetAddress;
+                            newPatron.City = city;
+                            newPatron.State = state;
+                            newPatron.PostalCode = postalCode;
+                            if (newPatron.CheckPhoneNumber(phoneNumber) == true)
+                            { newPatron.PhoneNumber = phoneNumber; }
+                            else
+                            { return StatusCode(400, "The phone number entered is not valid!"); }
+                            newPatron.PhoneNumber = phoneNumber;
+                            newPatron.Password = password;
+                            newPatron.AccountLock = "No";
+                            await _patronDao.AddPatron(newPatron);
+                            return Ok("New Patron created.");
+                        }
+                        else { return StatusCode(400, "Passwords entered do not match!"); }
+                    }
+                    else
+                    { return StatusCode(400, "That email is already in use. Please use a different email."); }
+                }
             }
             catch(Exception e)
             {
@@ -558,14 +601,19 @@ namespace LibraryAPI.Controllers
                     { updatePatron.Email = patron.Email; }
                     else
                     {
-                        var emailUnique = await _patronDao.CheckEmailUnique(updateEmail);
-                        if (emailUnique == true)
-                        {
-                            updatePatron.Email = updateEmail;
-                        }
+                        if (!updatePatron.IsValidEmailRegEx(updateEmail))
+                        { return StatusCode(400, "Please enter a valid email address!"); }
                         else
                         {
-                            return StatusCode(400, "That email is already in use. Please use a different email.");
+                            var emailUnique = await _patronDao.CheckEmailUnique(updateEmail);
+                            if (emailUnique == true)
+                            {
+                                updatePatron.Email = updateEmail;
+                            }
+                            else
+                            {
+                                return StatusCode(400, "That email is already in use. Please use a different email.");
+                            }
                         }
                     }
                     if (updateStreetAddress == null)
@@ -591,7 +639,12 @@ namespace LibraryAPI.Controllers
                     if (updatePhoneNumber == null)
                     { updatePatron.PhoneNumber = patron.PhoneNumber; }
                     else
-                    { updatePatron.PhoneNumber = updatePhoneNumber; }
+                    {
+                        if (updatePatron.CheckPhoneNumber(updatePhoneNumber) == true)
+                        { updatePatron.PhoneNumber = updatePhoneNumber; }
+                        else
+                        { return StatusCode(400, "The phone number entered is not valid!"); }
+                    }
                     if (updatePassword == null)
                     { updatePatron.Password = patron.Password; }
                     else

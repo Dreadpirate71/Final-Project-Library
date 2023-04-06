@@ -87,7 +87,20 @@ namespace LibraryAPI.Daos
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
         }
+        public async Task BookWaitList(int patronId, string bookTitle, string authorFName, string authorLName)
+        {
+            var query = $"INSERT INTO BookRequests(PatronId, BookTitle, AuthorFName, AuthorLName, WaitList)" +
+                        $"VALUES (@PatronId, @BookTitle, @AuthorFName, @AuthorLName, @WaitList)";
+            var parameters = new DynamicParameters();
+            parameters.Add("@PatronId", patronId, DbType.Int32);
+            parameters.Add("@BookTitle", bookTitle, DbType.String);
+            parameters.Add("@AuthorFName", authorFName, DbType.String);
+            parameters.Add("@AuthorLName", authorLName, DbType.String);
+            parameters.Add("@WaitList", "Yes", DbType.String);
 
+            using var connection = _context.CreateConnection();
+            await connection.ExecuteAsync(query, parameters);
+        }
         public async Task<BookModel> GetBookByTitle(string bookTitle)
         {
             bookTitle = bookTitle.Replace("'", "''");
