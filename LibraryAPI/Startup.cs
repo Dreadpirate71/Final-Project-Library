@@ -1,4 +1,5 @@
 using LibraryAPI.Daos;
+using LibraryAPI.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace LibraryAPI
 {
@@ -26,6 +28,9 @@ namespace LibraryAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddTransient<IMailService, Daos.MailService>();
+
             services.AddSingleton<DapperContext>();
             services.AddControllers();
             services.AddScoped<BookDao>();
@@ -40,6 +45,7 @@ namespace LibraryAPI
                 Description = "A CRUD Api for managing a library.",
                 Version = "v1"
             }));
+            services.AddCors(c => c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +57,7 @@ namespace LibraryAPI
             }
             app.UseSwagger();
             app.UseSwaggerUI(opt => opt.SwaggerEndpoint("/swagger/v1/swagger.json", "LibraryApi V1"));
-
+            app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -61,5 +67,6 @@ namespace LibraryAPI
                 endpoints.MapControllers();
             });
         }
+
     }
 }
