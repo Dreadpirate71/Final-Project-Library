@@ -56,9 +56,17 @@
               "target": "Package",
               "version": "[2.2.7, )"
             },
+            "MailKit": {
+              "target": "Package",
+              "version": "[3.6.0, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[16.11.0, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[3.6.1, )"
             },
             "Moq": {
               "target": "Package",
@@ -129,6 +137,10 @@
               "target": "Package",
               "version": "[2.0.123, )"
             },
+            "MailKit": {
+              "target": "Package",
+              "version": "[3.6.0, )"
+            },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[5.1.0, )"
@@ -136,6 +148,10 @@
             "Microsoft.OData.Edm": {
               "target": "Package",
               "version": "[7.14.0, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[3.6.1, )"
             },
             "NUnit": {
               "target": "Package",
