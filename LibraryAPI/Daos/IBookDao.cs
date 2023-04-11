@@ -26,6 +26,9 @@ namespace LibraryAPI.Daos
         Task <IEnumerable<BookModel>>GetOverdueBooks();
         Task <BookModel>GetBookByTitleAndId(string bookTitle, int patronId);
         Task BookWaitList(int patronId, string bookTitle, string authorFName, string authorLName);
+        Task <IEnumerable<BookRequestModel>> GetWaitListBooks();
+        Task <IEnumerable<BookRequestModel>> CheckForBookOnWaitList(string bookTitle);
+        Task DeleteWaitListBook(int patronId, string bookTitle);
 
     }
 }

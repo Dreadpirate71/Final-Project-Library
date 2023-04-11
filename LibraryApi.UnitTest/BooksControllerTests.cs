@@ -11,6 +11,7 @@ using NuGet.Frameworks;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -48,16 +49,19 @@ namespace LibraryApi.UnitTest
         private readonly PatronsController _patronsControllerMock;
         private readonly IEnumerable <BookModel>? _booksNull;
         private BookModel _bookModelMock;
+        private BookRequestModel _bookRequestModelMock;
         private StaffModel _staffModelMock;
         private PatronModel _patronModelMock;
         private IEnumerable<BookModel> _books;
         private BookModel? _bookModelMockNull;
         private PatronModel? _patronModelMockNull;
+        private BookRequestModel? _bookRequestModelMockNull;
         private readonly IEnumerable<string> _genres;
+        private readonly IEnumerable<BookRequestModel> _waitListBooks;
 
         public BooksControllerTests()
         {
-            _bookDaoMock= new Mock<IBookDao>();
+            _bookDaoMock = new Mock<IBookDao>();
             _patronDaoMock= new Mock<IPatronDao>();
             _staffDaoMock= new Mock<IStaffDao>();
             _booksControllerMock = new BooksController(_bookDaoMock.Object, _patronDaoMock.Object, _staffDaoMock.Object);
@@ -65,7 +69,9 @@ namespace LibraryApi.UnitTest
             _bookModelMock = new BookModel() { Id = 1200, BookTitle = "Wonder and Chaos of Being", AuthorFName = "Kris", AuthorLName = "Remus", Genre = "Fiction", Price = (decimal)12.00, Status = "In", CheckOutDate = null , PatronId = 1003};
             _patronModelMock = new PatronModel();
             _staffModelMock = new StaffModel();
+            _bookRequestModelMock = new BookRequestModel();
             _books = new List<BookModel>() { _bookModelMock};
+            _waitListBooks = new List<BookRequestModel>() { _bookRequestModelMock };
             _genres = new List<string>() { "History", "Education", "Young Adult Fiction" };
         }
         [ClassInitialize]
@@ -315,8 +321,9 @@ namespace LibraryApi.UnitTest
             
             //Assert
             Assert.IsNotNull(result);
-            //Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual(StatusCodes.Status200OK, (result as StatusCodeResult).StatusCode);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been checked out.", (result as ObjectResult).Value);
         }
 
         [TestMethod]
@@ -336,6 +343,7 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Book with this title does not exist!", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
 
         [TestMethod]
@@ -354,6 +362,7 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Patron with that email and password does not exist!", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
 
         [TestMethod]
@@ -372,6 +381,7 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Exceeded maximum of 5 books checked out! Please return a book to proceed.", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status400BadRequest, (result as ObjectResult).StatusCode);
         }
 
         [TestMethod]
@@ -391,7 +401,9 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Book Status = 'Out'. Please choose a book that is not already checked out.", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status400BadRequest, (result as ObjectResult).StatusCode);
         }
+    
         
         [TestMethod]
         public async Task GetListOfAllAvailableBooks_CreatesIEnumerable_ReturnsOkWithData()
@@ -452,6 +464,7 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("No books found with that Genre.", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
 
         [TestMethod]
@@ -508,6 +521,7 @@ namespace LibraryApi.UnitTest
             Console.WriteLine("Inside ReturnBookTest returns 200");
             _ = _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _ = _bookDaoMock.Setup(waitBooks => waitBooks.CheckForBookOnWaitList(It.IsAny<string>())).Returns(Task.FromResult(_waitListBooks));
             _ = _bookDaoMock.Setup(update => update.UpdateBookById(_bookModelMock)).Returns(Task.FromResult(_bookModelMock));
             _ = _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
             //Act
@@ -515,7 +529,8 @@ namespace LibraryApi.UnitTest
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("Book has been returned.", (result as ObjectResult).Value);
+            Assert.AreEqual("Book has been checked out to first eligible patron on waitlist.", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
 
         }
 
@@ -534,6 +549,7 @@ namespace LibraryApi.UnitTest
             Assert.IsTrue(result is ObjectResult);
             Console.Write((result as ObjectResult).ToString());
             Assert.AreEqual("No book checked out with that title!", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
 
         [TestMethod]
@@ -549,6 +565,26 @@ namespace LibraryApi.UnitTest
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Patron with that email and password does not exist!", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
+        }
+        [TestMethod]
+        public async Task ReturnBookTest_ActionExecuted_ReturnsBookReturnedMessage()
+        {
+            //Arrange
+            Console.WriteLine("Inside ReturnBookTest returns book returned message.");
+            _ = _patronDaoMock.Setup(check => check.CheckPatronCredentials(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            _ = _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _ = _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            //_ = _bookDaoMock.Setup(book => book.CheckForBookOnWaitList(It.IsAny<string>())).Returns(Task.FromResult(_bookRequestModelMockNull));
+            _ = _bookDaoMock.Setup(update => update.UpdateBookById(_bookModelMock)).Returns(Task.FromResult(_bookModelMock));
+            //Act
+            var result = await _booksControllerMock.ReturnBook("patronEmail", "patronPassword", "bookTitle");
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.IsNull(_bookRequestModelMockNull);
+            Assert.AreEqual("Book has been returned.", (result as ObjectResult).Value);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
         }
         [TestMethod]
         public async Task ReturnBookTest_ThrowsException_ReturnsExceptionError()
@@ -573,10 +609,11 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside CheckOverdueBooksTest returns ok");
+            _staffDaoMock.Setup(check => check.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(books => books.GetOverdueBooks()).Returns(Task.FromResult(_books));
 
             //Act
-            var result = await _booksControllerMock.GetOverdueBooks();
+            var result = await _booksControllerMock.GetOverdueBooks(1, "IMAdmin!");
 
             //Assert
             Assert.IsNotNull(result);
@@ -588,25 +625,27 @@ namespace LibraryApi.UnitTest
         {
             //Arrange
             Console.WriteLine("Inside CheckOverdueBooksTest returns ok");
+            _staffDaoMock.Setup(check => check.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _ = _bookDaoMock.Setup(books => books.GetOverdueBooks()).Returns(Task.FromResult(_booksNull));
 
             //Act
-            var result = await _booksControllerMock.GetOverdueBooks();
+            var result = await _booksControllerMock.GetOverdueBooks(1, "IMAdmin!");
 
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual("No overdue books found", (result as ObjectResult).Value);
+            Assert.IsNull(_booksNull);
         }
         [TestMethod]
         public async Task GetOverdueBooksTest_ThrowsException_ReturnsExceptionError()
         {
             //Arrange
             Console.WriteLine("Inside TestMethod CheckOverdueBooks throws exception");
+            _staffDaoMock.Setup(check => check.CheckStaffForAdmin(It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _bookDaoMock.Setup(books => books.GetOverdueBooks()).Throws<Exception>();
 
             //Act
-            var result = await _booksControllerMock.GetOverdueBooks();
+            var result = await _booksControllerMock.GetOverdueBooks(1, "IMAdmin!");
 
             //Assert
             Assert.IsNotNull(result);

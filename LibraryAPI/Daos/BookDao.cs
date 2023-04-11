@@ -2,6 +2,7 @@
 using LibraryAPI.Models;
 using LibraryAPI.Wrappers;
 using Microsoft.OData.Edm;
+using Org.BouncyCastle.Math.Field;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -81,7 +82,10 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", updateRequest.Genre, DbType.String);
             parameters.Add("@Price", updateRequest.Price, DbType.Decimal);
             parameters.Add("@Status", updateRequest.Status, DbType.String);
-            parameters.Add("@CheckOutDate", updateRequest.CheckOutDate.ToString(), DbType.Date);
+            if (updateRequest.CheckOutDate == null) 
+            { parameters.Add("@CheckOutDate", null, DbType.Date); }
+            else 
+            { parameters.Add("@CheckOutDate", updateRequest.CheckOutDate.ToString(), DbType.Date);}
             parameters.Add("@PatronId", updateRequest.PatronId, DbType.Int32);
 
             using var connection = _context.CreateConnection();
@@ -89,8 +93,10 @@ namespace LibraryAPI.Daos
         }
         public async Task BookWaitList(int patronId, string bookTitle, string authorFName, string authorLName)
         {
+            //bookTitle = bookTitle.Replace("'", "''");
             var query = $"INSERT INTO BookRequests(PatronId, BookTitle, AuthorFName, AuthorLName, WaitList)" +
                         $"VALUES (@PatronId, @BookTitle, @AuthorFName, @AuthorLName, @WaitList)";
+
             var parameters = new DynamicParameters();
             parameters.Add("@PatronId", patronId, DbType.Int32);
             parameters.Add("@BookTitle", bookTitle, DbType.String);
@@ -126,6 +132,16 @@ namespace LibraryAPI.Daos
                 await connection.ExecuteAsync(query);
             }
         }
+        public async Task DeleteWaitListBook(int patronId, string bookTitle)
+        {
+            bookTitle = bookTitle.Replace("'", "''");
+            var query = $"DELETE FROM BookRequests WHERE PatronId = '{patronId}' AND BookTitle = '{bookTitle}'";
+            using (var connection = _context.CreateConnection())
+            {
+                await connection.ExecuteAsync(query);
+            }
+        }
+
         public async Task<int> GetTotalOfCheckedOutBooks(int patronId)
         {
             var query = $"SELECT * FROM Books WHERE PatronId = '{patronId}'";
@@ -151,6 +167,7 @@ namespace LibraryAPI.Daos
         }
         public async Task<BookModel> GetBookByTitleAndId(string bookTitle, int patronId)
         {
+            bookTitle = bookTitle.Replace("'", "''");
             var query = $"SELECT * FROM Books WHERE BookTitle = '{bookTitle}' AND PatronId= '{patronId}'";
             using var connection = _context.CreateConnection();
             var bookOut = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
@@ -171,6 +188,22 @@ namespace LibraryAPI.Daos
             var genres = await connection.QueryAsync<string>(query);
             return genres.ToList();
         }
+        public async Task<IEnumerable<BookRequestModel>> GetWaitListBooks()
+        {
+            var query = $"SELECT * FROM BookRequests";
+            using var connection = _context.CreateConnection();
+            var waitListBooks = await connection.QueryAsync<BookRequestModel>(query);
+            return waitListBooks.ToList();
+        }
+        public async Task<IEnumerable<BookRequestModel>> CheckForBookOnWaitList(string bookTitle)
+        {
+            bookTitle = bookTitle.Replace("'", "''");
+            var query = $"SELECT * FROM BookRequests WHERE BookTitle = '{bookTitle}' AND WaitList = 'Yes'";
+            using var connection = _context.CreateConnection();
+            var waitListBook = await connection.QueryAsync<BookRequestModel>(query);
+            return waitListBook.ToList();
+        }
+
         public void GetBook()
         {
             _sqlWrapper.QueryBook<BookModel>("SELECT * FROM Books");
