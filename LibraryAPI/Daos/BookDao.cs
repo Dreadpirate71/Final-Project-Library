@@ -82,10 +82,10 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", updateRequest.Genre, DbType.String);
             parameters.Add("@Price", updateRequest.Price, DbType.Decimal);
             parameters.Add("@Status", updateRequest.Status, DbType.String);
-            if (updateRequest.CheckOutDate == null) 
+            if (updateRequest.CheckOutDate == null)
             { parameters.Add("@CheckOutDate", null, DbType.Date); }
-            else 
-            { parameters.Add("@CheckOutDate", updateRequest.CheckOutDate.ToString(), DbType.Date);}
+            else
+            { parameters.Add("@CheckOutDate", updateRequest.CheckOutDate.ToString(), DbType.Date); }
             parameters.Add("@PatronId", updateRequest.PatronId, DbType.Int32);
 
             using var connection = _context.CreateConnection();
@@ -107,6 +107,24 @@ namespace LibraryAPI.Daos
             using var connection = _context.CreateConnection();
             await connection.ExecuteAsync(query, parameters);
         }
+        
+        
+        public async Task BookRequestList(int patronId, string bookTitle, string authorFName, string authorLName)
+        {
+            var query = $"INSERT INTO BookRequests(PatronId, BookTitle, AuthorFName, AuthorLName, WaitList)" +
+                        $"VALUES (@PatronId, @BookTitle, @AuthorFName, @AuthorLName, @WaitList)";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@PatronId", patronId, DbType.Int32);
+            parameters.Add("@BookTitle", bookTitle, DbType.String);
+            parameters.Add("@AuthorFName", authorFName, DbType.String);
+            parameters.Add("@AuthorLName", authorLName, DbType.String);
+            parameters.Add("@WaitList", "No", DbType.String);
+
+            using var connection = _context.CreateConnection();
+            await connection.ExecuteAsync(query, parameters);
+        }
+
         public async Task<BookModel> GetBookByTitle(string bookTitle)
         {
             bookTitle = bookTitle.Replace("'", "''");
@@ -157,6 +175,8 @@ namespace LibraryAPI.Daos
             var booksOut = await connection.QueryAsync<BookModel>(query);
             return booksOut.ToList();
         }
+
+        
         public async Task<IEnumerable<BookModel>> GetOverdueBooks()
         {
             var query = $"SELECT * FROM Books WHERE CheckOutDate < DATEADD(DAY, -14, GETDATE())";
@@ -190,7 +210,7 @@ namespace LibraryAPI.Daos
         }
         public async Task<IEnumerable<BookRequestModel>> GetWaitListBooks()
         {
-            var query = $"SELECT * FROM BookRequests";
+            var query = $"SELECT * FROM BookRequests WHERE WaitList = 'Yes'";
             using var connection = _context.CreateConnection();
             var waitListBooks = await connection.QueryAsync<BookRequestModel>(query);
             return waitListBooks.ToList();
@@ -202,6 +222,14 @@ namespace LibraryAPI.Daos
             using var connection = _context.CreateConnection();
             var waitListBook = await connection.QueryAsync<BookRequestModel>(query);
             return waitListBook.ToList();
+        }
+
+        public async Task<IEnumerable<BookRequestModel>> GetRequestListBooks()
+        {
+            var query = $"SELECT * FROM BookRequests WHERE WaitList = 'No'";
+            using var connection = _context.CreateConnection();
+            var requestBooks = await connection.QueryAsync<BookRequestModel>(query);
+            return requestBooks.ToList();
         }
 
         public void GetBook()

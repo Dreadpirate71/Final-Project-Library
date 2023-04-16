@@ -22,29 +22,18 @@ namespace LibraryAPI.Controllers
 {
     public class BooksController : ControllerBase
     {
-        /*public enum GenreEnum
-        {
-            ChildrensFiction,
-            Architecture,
-            Autobiography,
-            Biography,
-            Drama,
-            Education,
-            FairyTales,
-            History
-        }
-        private readonly GenreEnum _genreEnum;*/
         private readonly IBookDao _bookDao;
         private readonly IPatronDao _patronDao;
         private readonly IStaffDao _staffDao;
 
         public BooksController(IBookDao bookDao, IPatronDao patronDao, IStaffDao staffDao)
         {
-            this._bookDao = bookDao;
-            this._patronDao = patronDao;
-            this._staffDao = staffDao;
+            _bookDao = bookDao;
+            _patronDao = patronDao;
+            _staffDao = staffDao;
         }
-
+        
+        
         [HttpGet]
         [Route("Books")]
         public async Task<IActionResult> GetListOfAllBooks()
@@ -59,6 +48,7 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
         [HttpGet]
         [Route("Books/Available")]
         public async Task<IActionResult> GetListOfAllAvailableBooks()
@@ -73,6 +63,7 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
         [HttpGet]
         [Route("BookByTitle/{bookTitle}")]
         public async Task<IActionResult> GetBookByTitle([FromRoute] string bookTitle)
@@ -91,6 +82,7 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
         [HttpGet]
         [Route("BookById/{id}")]
         public async Task<IActionResult> GetBookById([FromRoute] int id)
@@ -119,11 +111,15 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You need to have an adminId to complete this task");
+                    return StatusCode(404, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
                     var overdueBooks = await _bookDao.GetOverdueBooks();
+                    if (overdueBooks == null)
+                    {
+                        return StatusCode(404, "No overdue books found.");
+                    }
                     return Ok(overdueBooks);
                 }
             }
@@ -147,10 +143,6 @@ namespace LibraryAPI.Controllers
                 else
                 {
                     var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                    if (patron == null)
-                    {
-                        return StatusCode(404, "Patron with that email does not exist!");
-                    }
                     var patronBooksOut = await _bookDao.GetListOfBooksCheckedOut(patron.Id);
                     if (patronBooksOut == null)
                     {
@@ -199,22 +191,42 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
         [HttpGet]
         [Route("BooksOnWaitList")]
         public async Task<IActionResult> GetBooksOnWaitList()
         {
             try
             {
-                var books = await _bookDao.GetWaitListBooks();
-                if (books == null)
+                var waitBooks = await _bookDao.GetWaitListBooks();
+                if (waitBooks == null)
                 {
                     return StatusCode(404, "There are no books currently on the waitlist.");
                 }
-                return Ok(books);
+                return Ok(waitBooks);
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("BooksOnRequestList")]
+        public async Task<IActionResult> GetBooksOnRequestList()
+        {
+            try
+            {
+                var requestBooks = await _bookDao.GetRequestListBooks();
+                if (requestBooks == null)
+                {
+                    return StatusCode(404, "There are no books currently on the request list.");
+                }
+                return Ok(requestBooks);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message) ;
             }
         }
 
@@ -227,21 +239,24 @@ namespace LibraryAPI.Controllers
             return Ok();
            
         }
+
         [HttpPost]
         [Route("NewBook/{adminId}, {adminPassword}")]
         public async Task<IActionResult> AddBook([FromRoute] int adminId, [FromRoute] string adminPassword, string bookTitle, string authorFname, string authorLName, string genre, decimal price)
         {
             try
             {
+                var message = "";
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You need to have an adminId to complete this task");
+                    return StatusCode(403, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
                     await _bookDao.AddBook(bookTitle, authorFname, authorLName, genre, price);
-                    return Ok();
+                    message = bookTitle + " has been added to library.";
+                    return Ok(message);
                 }
             }
             catch (Exception e)
@@ -260,7 +275,7 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You need to have an adminId to complete this task");
+                    return StatusCode(403, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
@@ -328,27 +343,32 @@ namespace LibraryAPI.Controllers
                 {
 
                     var book = await _bookDao.GetBookByTitle(bookTitle);
-                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
                     if (book == null)
                     {
                         return StatusCode(404, "Book with this title does not exist!");
                     }
                     
+                    if (book.Status == "Out")
+                    {
+                        return StatusCode(400, "Book Status = 'Out'. Please choose a book that is not already checked out.");
+                    }
+
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
                     var patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(patron.Id);
                     if (patronBooksOut >= 5)
                     {
                         return StatusCode(400, "Exceeded maximum of 5 books checked out! Please return a book to proceed.");
                     }
-                    else if (book.Status == "Out")
+                    else 
                     {
-                        return StatusCode(400, "Book Status = 'Out'. Please choose a book that is not already checked out.");
+                        book.Status = "Out";
+                        book.PatronId = patron.Id;
+                        book.CheckOutDate = DateTime.Now;
+                        await _bookDao.UpdateBookById(book);
+                        string statusMessage = bookTitle + " has been checked out.";
+                        return StatusCode(200, statusMessage);
                     }
-                    book.Status = "Out";
-                    book.PatronId = patron.Id;
-                    book.CheckOutDate = DateTime.Now;
-                    await _bookDao.UpdateBookById(book);
-                    string statusMessage = bookTitle + " has been checked out.";
-                    return StatusCode(200, statusMessage);
+                    
                 }
             }
             catch (Exception e)
@@ -470,16 +490,59 @@ namespace LibraryAPI.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+        [HttpPatch]
+        [Route("BookRequestList/{patronEmail}, {patronPassword}, {bookTitle}")]
+        public async Task<IActionResult> AddBookToRequestList([FromRoute] string patronEmail, [FromRoute] string patronPassword, [FromRoute] string bookTitle,
+                                                                string authorFName, string authorLName)
+        {
+            try
+            {
+                var message = "";
+                var checkCredentials = await _patronDao.CheckPatronCredentials(patronEmail, patronPassword);
+                if (checkCredentials == false)
+                {
+                    return StatusCode(404, "Patron with that email and password does not exist!");
+                }
+                
+                
+                var book = await _bookDao.GetBookByTitle(bookTitle);
+                if (book == null)
+                {
+                    var patron = await _patronDao.GetPatronByEmail(patronEmail);
+                    var reqeuestBook = _bookDao.BookRequestList(patron.Id, bookTitle, authorFName, authorLName);
+                    message = bookTitle + " has been added to the request list.";
+                    return StatusCode(200, message);
+                }
+
+                if (book.Status == "In")
+                {
+                    message = bookTitle + " is available to check out.";
+                    return StatusCode(400, message); }
+
+                else
+                {
+                    message = bookTitle + " is currently checked out. You can add it to the wait list.";
+                    return StatusCode(400, message); }
+                                  
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
         [HttpDelete]
         [Route("Book/{adminId}, {adminPassword}, {bookId}")]
         public async Task<IActionResult> DeleteBookById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int bookId)
         {
             try
             {
+                var message = "";
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You need to have an adminId to complete this task");
+                    return StatusCode(403, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
@@ -489,7 +552,8 @@ namespace LibraryAPI.Controllers
                         return StatusCode(404, "No book found with that Id!");
                     }
                     await _bookDao.DeleteBookById(book.Id);
-                    return StatusCode(200);
+                    message = book.BookTitle + " with Id " + book.Id + " has been deleted.";
+                    return StatusCode(200, message);
                 }
             }
             catch (Exception e)
@@ -506,8 +570,8 @@ namespace LibraryAPI.Controllers
         
         public PatronsController(IPatronDao patronDao, IStaffDao staffDao)
         {
-            this._patronDao= patronDao;
-            this._staffDao= staffDao;
+            _patronDao= patronDao;
+            _staffDao= staffDao;
         }
         
         [HttpGet]
@@ -519,7 +583,7 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You do not have proper admin credentials!");
+                    return StatusCode(403, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
@@ -542,7 +606,7 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You do not have proper admin credentials!");
+                    return StatusCode(403, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {
@@ -574,10 +638,6 @@ namespace LibraryAPI.Controllers
                 else
                 {
                     var patron = await _patronDao.GetPatronByEmail(patronEmail);
-                    if (patron == null)
-                    {
-                        return StatusCode(404, "Patron with that email does not exist!");
-                    }
                     return Ok(patron);
                 }
             }
@@ -630,7 +690,6 @@ namespace LibraryAPI.Controllers
             {
                 return StatusCode(500, e.Message);
             }
-            
         }
         
         [HttpPatch]
@@ -776,7 +835,7 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (adminCheck == false)
                 {
-                    return StatusCode(404, "You do not have proper admin credentials!");
+                    return StatusCode(400, "You need to have proper admin credentials to complete this task!");
                 }
                 var staff = await _staffDao.GetStaff();
                 return Ok(staff);
@@ -787,23 +846,31 @@ namespace LibraryAPI.Controllers
             }
         }
         [HttpPost]
-        [Route("Staff")]
-        public async Task<IActionResult> AddStaff(string firstName, string lastName, string phoneNumber, string position, string password, string confirmPassword)
+        [Route("NewStaff/{adminId}, {adminPassword}")]
+        public async Task<IActionResult> AddStaff([FromRoute] int adminId, [FromRoute] string adminPassword, string firstName, string lastName, string phoneNumber, string position, string password, string confirmPassword)
         {
-            
+            var patron = new PatronModel();
             try
             {
+                var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
+                if (adminCheck == false)
+                {
+                    return StatusCode(400, "You need to have proper admin credentials to complete this task!");
+                }
+                if (patron.CheckPhoneNumber(phoneNumber)== false)
+                {
+                    return StatusCode(400, "The phone number entered is not valid!");
+                }
                 if (password == confirmPassword)
                 {
                     await _staffDao.AddStaff(firstName, lastName, phoneNumber, position, password);
-                    return Ok();
+                    return Ok("Staff member has been added.");
                 }
                 else
                 {
                     return StatusCode(400, "Passwords entered do not match!");
                 }
             }
-            
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
@@ -811,47 +878,59 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("Staff/{adminId}, {adminPassword}, {staffId}")]
-        public async Task<IActionResult> UpdateStaffById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int staffId,  string firstName, string lastName, string phoneNumber, string position, string password)
+        [Route("UpdateStaff/{adminId}, {adminPassword}, {staffId}")]
+        public async Task<IActionResult> UpdateStaffById([FromRoute] int adminId, [FromRoute] string adminPassword, [FromRoute] int staffId, string updateFirstName,
+                                                            string updateLastName, string updatePhoneNumber, string updatePosition, string updatePassword, string updateConfirmPassword)
         {
             var updateStaff = new StaffModel();
+            var patron = new PatronModel();
             try
             {
                 var staff = await _staffDao.GetStaffById(staffId);
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
 
                 if (adminCheck == false)
-                {return StatusCode(404, "You do not have proper admin credentials!");}
+                {return StatusCode(400, "You need to have proper admin credentials to complete this task!");}
 
                 else if (staff == null)
-                { return StatusCode(404, "No staff member with that Id."); }
+                { return StatusCode(404, "Staff member with that Id does not exist!"); }
 
                 else
                 {
                     updateStaff.Id = staffId;
-                    if (firstName == null)
+                    if (updateFirstName == null)
                     { updateStaff.FirstName = staff.FirstName; }
-                    else { updateStaff.FirstName = firstName; }
+                    else { updateStaff.FirstName = updateFirstName; }
 
-                    if (lastName == null)
+                    if (updateLastName == null)
                     { updateStaff.LastName = staff.LastName; }
-                    else { updateStaff.LastName = lastName; }
+                    else { updateStaff.LastName = updateLastName; }
 
-                    if (phoneNumber == null) 
+                    if (updatePhoneNumber == null) 
                     { updateStaff.PhoneNumber = staff.PhoneNumber; }
                     else
-                    {updateStaff.PhoneNumber = phoneNumber;}
+                    {
+                        if (patron.CheckPhoneNumber(updatePhoneNumber) == false)
+                        {
+                            return StatusCode(400, "The phone number entered is not valid!");
+                        }
+                        updateStaff.PhoneNumber = updatePhoneNumber;
+                    }
 
-                    if (position == null)
-                    { updateStaff.Position = position; }
+                    if (updatePosition == null)
+                    { updateStaff.Position = staff.Position; }
                     else 
-                    { updateStaff.Position = position; }
+                    { updateStaff.Position = updatePosition; }
 
-                    if (password == null)
-                    { updateStaff.Password = password; }
+                    if (updatePassword == null)
+                    { updateStaff.Password = staff.Password; }
                     else
-                    { updateStaff.Password = password; }
-
+                    {
+                        if (updatePassword == updateConfirmPassword)
+                        { updateStaff.Password = updatePassword; }
+                        else
+                        { return StatusCode(400, "Passwords entered do not match!"); }
+                    }
                     await _staffDao.UpdateStaffById(updateStaff);
                     return StatusCode(200, "Staff member has been updated.");
                 }
@@ -872,11 +951,11 @@ namespace LibraryAPI.Controllers
                 var adminCheck = await _staffDao.CheckStaffForAdmin(adminId, adminPassword);
                 if (staff == null)
                 {
-                    return StatusCode(404, "No staff with that Id.");
+                    return StatusCode(404, "Staff member with that Id does not exist!");
                 }
                 else if (adminCheck == false)
                 {
-                    return StatusCode(404, "You do not have proper admin credentials!");
+                    return StatusCode(400, "You need to have proper admin credentials to complete this task!");
                 }
                 else
                 {

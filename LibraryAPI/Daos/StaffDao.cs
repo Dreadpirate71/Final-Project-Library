@@ -69,13 +69,12 @@ namespace LibraryAPI.Daos
             }
         }
 
-        public async Task<IEnumerable<StaffModel>> DeleteStaffById(int id)
+        public async Task DeleteStaffById(int id)
         {
             var query = $"DELETE FROM Staff WHERE Id = {id}";
             using (var connection = _context.CreateConnection())
             {
-                var staff = await connection.QueryAsync<StaffModel>(query);
-                return staff.ToList();
+                var staff = await connection.ExecuteAsync(query);
             }
         }
         public async Task UpdateStaffById(StaffModel updateRequest)
@@ -115,7 +114,7 @@ namespace LibraryAPI.Daos
         }
         public void GetListOfAllStaffTest()
         {
-            _sqlWrapper.QueryStaff<StaffModel>("SELECT * FROM Patrons");
+            _sqlWrapper.QueryStaff<StaffModel>("SELECT * FROM Staff");
         }
         public void DeleteStaff()
         {
