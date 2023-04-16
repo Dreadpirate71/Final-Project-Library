@@ -25,7 +25,7 @@ namespace LibraryApi.UnitTest
         public void CallSqlWithSelectString_VerifyQueries_MatchingExpressionsConfirmed()
         {
             _staffDaoMock.GetListOfAllStaffTest();
-            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryStaff<StaffModel>(It.Is<string>(sql => sql == "SELECT * FROM Patrons")), Times.Once);
+            _mockSqlWrapper.Verify(sqlWrapper => sqlWrapper.QueryStaff<StaffModel>(It.Is<string>(sql => sql == "SELECT * FROM Staff")), Times.Once);
         }
         [TestMethod]
         public void CallSqlWithDeleteString_VerifyQueries_MatchingExpressionsConfirmed()

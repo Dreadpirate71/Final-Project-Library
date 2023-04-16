@@ -29,6 +29,8 @@ namespace LibraryAPI.Daos
         Task <IEnumerable<BookRequestModel>> GetWaitListBooks();
         Task <IEnumerable<BookRequestModel>> CheckForBookOnWaitList(string bookTitle);
         Task DeleteWaitListBook(int patronId, string bookTitle);
+        Task BookRequestList(int patronId, string bookTitle, string authorFName, string authorLName);
+        Task<IEnumerable<BookRequestModel>> GetRequestListBooks();
 
     }
 }
