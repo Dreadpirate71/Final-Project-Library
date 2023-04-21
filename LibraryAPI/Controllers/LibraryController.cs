@@ -393,13 +393,13 @@ namespace LibraryAPI.Controllers
                 {
                     var patron = await _patronDao.GetPatronByEmail(patronEmail);
                     var book = await _bookDao.GetBookByTitleAndId(bookTitle, patron.Id);
-                    var waitListBooks = await _bookDao.CheckForBookOnWaitList(bookTitle);
 
                     if (book == null)
                     {
                         return StatusCode(404, "No book checked out with that title!");
                     }
 
+                    var waitListBooks = await _bookDao.CheckForBookOnWaitList(bookTitle);
                     if (waitListBooks.Count() == 0)
                     {
                         book.PatronId = 1003;

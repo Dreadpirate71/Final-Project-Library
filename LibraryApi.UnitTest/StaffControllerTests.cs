@@ -177,7 +177,7 @@ namespace LibraryApi.UnitTest
             //Assert
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ObjectResult));
-            Assert.AreEqual("You need to have proper admin credentials to complete this task!", (result as ObjectResult).Value);
+            Assert.AreEqual("Staff member with that Id does not exist!", (result as ObjectResult).Value);
             Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
 
