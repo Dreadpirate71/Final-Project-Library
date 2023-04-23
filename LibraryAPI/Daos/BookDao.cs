@@ -6,6 +6,7 @@ using Org.BouncyCastle.Math.Field;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
@@ -43,17 +44,18 @@ namespace LibraryAPI.Daos
             return books.ToList();
         }
 
-        public async Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks()
+        public async Task<IEnumerable<BookModel>> GetListOfBooksByStatus(string status)
         {
-            var query = "SELECT * FROM Books WHERE Status = 'In'";
+            var query = $"SELECT * FROM Books WHERE Status = '{status}'";
             using var connection = _context.CreateConnection();
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();
         }
+
         public async Task AddBook(string bookTitle, string authorFName, string authorLName, string genre, decimal price)
         {
-            var query = $"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, CheckOutDate, PatronId)" +
-                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @CheckOutDate, @PatronId)";
+            var query = $"INSERT INTO Books (BookTitle, AuthorFName, AuthorLName, Genre, Price, Status, DueDate, PatronId)" +
+                $"VALUES (@BookTitle, @AuthorFname, @AuthorLName, @Genre, @Price, @Status, @DueDate, @PatronId)";
 
             var parameters = new DynamicParameters();
             parameters.Add("@BookTitle", bookTitle, DbType.String);
@@ -62,7 +64,7 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", genre, DbType.String);
             parameters.Add("@Price", price, DbType.Decimal);
             parameters.Add("@Status", "In", DbType.String);
-            parameters.Add("@CheckOutDate", null, DbType.Date);
+            parameters.Add("@DueDate", null, DbType.Date);
             parameters.Add("@PatronId", 1003, DbType.Int32);
 
             using var connection = _context.CreateConnection();
@@ -72,7 +74,7 @@ namespace LibraryAPI.Daos
         public async Task UpdateBookById(BookModel updateRequest)
         {
             var query = $"UPDATE Books SET BookTitle = @BookTitle, AuthorFName = @AuthorFName, AuthorLName = @AuthorLName, Genre = @Genre," +
-                        $"Price = @Price, Status = @Status, CheckOutDate = @CheckOutDate, PatronId = @PatronId WHERE Id = @Id";
+                        $"Price = @Price, Status = @Status, DueDate = @DueDate, PatronId = @PatronId WHERE Id = @Id";
 
             var parameters = new DynamicParameters();
             parameters.Add("@Id", updateRequest.Id, DbType.Int32);
@@ -82,10 +84,10 @@ namespace LibraryAPI.Daos
             parameters.Add("@Genre", updateRequest.Genre, DbType.String);
             parameters.Add("@Price", updateRequest.Price, DbType.Decimal);
             parameters.Add("@Status", updateRequest.Status, DbType.String);
-            if (updateRequest.CheckOutDate == null)
-            { parameters.Add("@CheckOutDate", null, DbType.Date); }
+            if (updateRequest.DueDate == null)
+            { parameters.Add("@DueDate", null, DbType.Date); }
             else
-            { parameters.Add("@CheckOutDate", updateRequest.CheckOutDate.ToString(), DbType.Date); }
+            { parameters.Add("@DueDate", updateRequest.DueDate.ToString(), DbType.Date); }
             parameters.Add("@PatronId", updateRequest.PatronId, DbType.Int32);
 
             using var connection = _context.CreateConnection();
@@ -136,16 +138,35 @@ namespace LibraryAPI.Daos
         public async Task<BookModel> GetBookById(int Id)
         {
             var query = $"SELECT * FROM Books WHERE Id = '{Id}'";
-            using (var connection = _context.CreateConnection())
+            using var connection = _context.CreateConnection();
             {
                 var bookById = await connection.QueryFirstOrDefaultAsync<BookModel>(query);
                 return bookById;
             }
         }
+        public async Task<IEnumerable<BookModel>> GetBooksByAuthorLName(string authorLName)
+        {
+            var query = $"SELECT * FROM Books WHERE AuthorLName = '{authorLName}'";
+            using var connection = _context.CreateConnection();
+            {
+                var booksByAuthor = await connection.QueryAsync<BookModel>(query);
+                return booksByAuthor.ToList();
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetBooksHistory(int patronId)
+        {
+            var query = $"SELECT BooksHistory FROM Patrons WHERE Id = {patronId}";
+            using var connection = _context.CreateConnection();
+            {
+                var booksHistory = await connection.QueryAsync<string>(query);
+                return booksHistory.ToList();
+            }
+        }
         public async Task DeleteBookById(int Id)
         {
             var query = $"DELETE FROM Books WHERE Id = '{Id}'";
-            using (var connection = _context.CreateConnection())
+            using var connection = _context.CreateConnection();
             {
                 await connection.ExecuteAsync(query);
             }
@@ -179,7 +200,7 @@ namespace LibraryAPI.Daos
         
         public async Task<IEnumerable<BookModel>> GetOverdueBooks()
         {
-            var query = $"SELECT * FROM Books WHERE CheckOutDate < DATEADD(DAY, -14, GETDATE())";
+            var query = $"SELECT * FROM Books WHERE DueDate < GETDATE() ORDER BY PatronId";
             using var connection = _context.CreateConnection();
             var books = await connection.QueryAsync<BookModel>(query);
             return books.ToList();

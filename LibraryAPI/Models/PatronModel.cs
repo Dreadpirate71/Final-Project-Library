@@ -16,8 +16,7 @@ namespace LibraryAPI.Models
         public string State { get; set; }
         public string PostalCode { get; set; }
         public string PhoneNumber { get; set; }
-        public string Password { get; set; }
-        public string AccountLock { get; set; }
+        public string BooksHistory { get; set; }
         public bool CheckPhoneNumber(string phoneNumber)
         {
             const string pattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";

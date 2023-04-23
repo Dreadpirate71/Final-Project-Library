@@ -37,12 +37,17 @@ namespace LibraryAPI
             services.AddControllers();
             services.AddScoped<PatronDao>();
             services.AddScoped<IPatronDao, PatronDao>();
-            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "LibraryApi",
-                Description = "A CRUD Api for managing a library.",
-                Version = "v1"
-            }));
+            services.AddSwaggerGen(c =>
+            { 
+                c.EnableAnnotations();
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "LibraryApi",
+                    Description = "A CRUD Api for managing a library.",
+                    Version = "v1"
+                });
+            }); 
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

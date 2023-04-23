@@ -21,7 +21,7 @@ namespace LibraryAPI.Daos
         Task<int> GetTotalOfCheckedOutBooks(int patronId);
         Task<IEnumerable<BookModel>> GetListOfBooksCheckedOut(int patronId);
         Task<IEnumerable<BookModel>> GetBookByGenre(string bookGenre);
-        Task<IEnumerable<BookModel>> GetListOfAllAvailableBooks();
+        Task<IEnumerable<BookModel>> GetListOfBooksByStatus(string status);
         Task<IEnumerable<string>> GetListOfGenres();
         Task <IEnumerable<BookModel>>GetOverdueBooks();
         Task <BookModel>GetBookByTitleAndId(string bookTitle, int patronId);
@@ -30,7 +30,8 @@ namespace LibraryAPI.Daos
         Task <IEnumerable<BookRequestModel>> CheckForBookOnWaitList(string bookTitle);
         Task DeleteWaitListBook(int patronId, string bookTitle);
         Task BookRequestList(int patronId, string bookTitle, string authorFName, string authorLName);
-        Task<IEnumerable<BookRequestModel>> GetRequestListBooks();
-
+        Task <IEnumerable<BookRequestModel>> GetRequestListBooks();
+        Task <IEnumerable<BookModel>> GetBooksByAuthorLName(string authorLName);
+        Task <IEnumerable<string>> GetBooksHistory(int patronId);
     }
 }
