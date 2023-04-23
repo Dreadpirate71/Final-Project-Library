@@ -319,9 +319,10 @@ namespace LibraryAPI.Controllers
                         }
                         do
                         {
+                            elem++;
                             if (elem < waitListBooks.Count())
                             {
-                                elem++;
+                                //elem++;
                                 waitBook = waitListBooks.ElementAt(elem);
                                 patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(waitBook.PatronId);
                                 if (patronBooksOut < 5)

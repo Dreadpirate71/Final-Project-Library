@@ -49,7 +49,7 @@ namespace LibraryApi.UnitTest
         private readonly Mock<IStaffDao> _staffDaoMock;
         private readonly BooksController _booksControllerMock;
         private readonly PatronsController _patronsControllerMock;
-        private readonly IEnumerable <BookModel>? _booksNull;
+        private readonly IEnumerable<BookModel>? _booksNull;
         private BookModel _bookModelMock;
         private BookRequestModel _bookRequestModelMock;
         private StaffModel _staffModelMock;
@@ -62,7 +62,7 @@ namespace LibraryApi.UnitTest
         private IEnumerable<BookRequestModel>? _waitListBooks;
         private readonly IEnumerable<string> _booksHistory;
         private readonly IEnumerable<string>? _booksHistoryNull;
-        
+
 
         public BooksControllerTests()
         {
@@ -71,15 +71,15 @@ namespace LibraryApi.UnitTest
             _staffDaoMock = new Mock<IStaffDao>();
             _booksControllerMock = new BooksController(_bookDaoMock.Object, _patronDaoMock.Object, _staffDaoMock.Object);
             _patronsControllerMock = new PatronsController(_patronDaoMock.Object, _staffDaoMock.Object);
-            _bookModelMock = new BookModel() { Id = 1200, BookTitle = "Wonder and Chaos of Being", AuthorFName = "Kris", AuthorLName = "Remus", Genre = "Fiction", Price = (decimal)12.00, Status = "In", DueDate = null , PatronId = 1003};
+            _bookModelMock = new BookModel() { Id = 1200, BookTitle = "Wonder and Chaos of Being", AuthorFName = "Kris", AuthorLName = "Remus", Genre = "Fiction", Price = (decimal)12.00, Status = "In", DueDate = null, PatronId = 1003 };
             _patronModelMock = new PatronModel();
             _staffModelMock = new StaffModel();
             _bookRequestModelMock = new BookRequestModel();
-            _books = new List<BookModel>() { _bookModelMock};
-            _waitListBooks = new List<BookRequestModel>() { _bookRequestModelMock };
+            _books = new List<BookModel>() { _bookModelMock };
+            _waitListBooks = new List<BookRequestModel>() { _bookRequestModelMock, _bookRequestModelMock };
             _genres = new List<string>() { "History", "Education", "Young Adult Fiction" };
             _booksHistory = new List<string>() { "Wonder and Chaos of Being|HarryPotter and the Philosopher's Stone|New Moon" };
-          
+
         }
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
@@ -102,11 +102,11 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.AddBook("C# Player's Guide", "RB", "Whitaker", "Educational", (decimal)12.00);
-            
+
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
-            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode );
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
             Assert.AreEqual("C# Player's Guide has been added to library.", (result as ObjectResult).Value);
         }
 
@@ -118,7 +118,7 @@ namespace LibraryApi.UnitTest
             _bookDaoMock.Setup(book => book.GetBookById(It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
 
             //Act
-            var result = await _booksControllerMock.GetBook(1, null, null, null,0, 0, null, null, null );
+            var result = await _booksControllerMock.GetBook(1, null, null, null, 0, 0, null, null, null);
 
             //Assert
             Assert.IsNotNull(result);
@@ -187,7 +187,7 @@ namespace LibraryApi.UnitTest
             _bookDaoMock.Setup(books => books.GetListOfBooksCheckedOut(It.IsAny<int>())).Returns(Task.FromResult(_books));
 
             //Act
-            var result = await _booksControllerMock.GetBook(0, null, null, null , 1, 0, null, null, null);
+            var result = await _booksControllerMock.GetBook(0, null, null, null, 1, 0, null, null, null);
 
             //Assert
             Assert.IsNotNull(result);
@@ -267,15 +267,15 @@ namespace LibraryApi.UnitTest
             Assert.AreEqual(_books, (result as ObjectResult).Value);
         }
 
-        [TestMethod]  
+        [TestMethod]
         public async Task GetBooksTest_ActionExecutes_ReturnsIdNullMessage()
         {
             //Arrange 
             Console.WriteLine("Inside GetBooksTest returns error message.");
-            
+
             //Act
             var result = await _booksControllerMock.GetBook(1, null, null, null, 0, 0, null, null, null);
-            
+
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
@@ -507,8 +507,8 @@ namespace LibraryApi.UnitTest
             _bookDaoMock.Setup(book => book.GetBookById(It.IsAny<int>())).Returns(Task.FromResult(_bookModelMockNull));
 
             //Act
-            var result = await _booksControllerMock.UpdateBookById(1,"C# Player's Guide", "RB", "Whitaker", "Education", (decimal)12.00);
-            
+            var result = await _booksControllerMock.UpdateBookById(1, "C# Player's Guide", "RB", "Whitaker", "Education", (decimal)12.00);
+
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
@@ -562,7 +562,7 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
-           
+
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
@@ -570,7 +570,7 @@ namespace LibraryApi.UnitTest
             Assert.AreEqual("No book found with that Id!", (result as ObjectResult).Value);
             Assert.AreEqual(StatusCodes.Status404NotFound, (result as ObjectResult).StatusCode);
         }
-        
+
         [TestMethod]
         public async Task DeleteBookByIdTest_ThrowsException_ReturnsExceptionError()
         {
@@ -581,12 +581,138 @@ namespace LibraryApi.UnitTest
 
             //Act
             var result = await _booksControllerMock.DeleteBookById(_bookModelMock.Id);
-            
+
             //Assert
             Assert.IsNotNull(result);
             Assert.IsTrue(result is ObjectResult);
             Assert.AreEqual("Exception of type 'System.Exception' was thrown.", (result as ObjectResult).Value);
             Assert.AreEqual(StatusCodes.Status500InternalServerError, (result as ObjectResult).StatusCode);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_CheckOutBookExecutes_ReturnsOkWithObjectWhenSuccessful()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest check out book returns success.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookDaoMock.Setup(booksOut => booksOut.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(0));
+
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, "email@patron.com", "Y", null, null);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode );
+            Assert.AreEqual("Wonder and Chaos of Being has been checked out.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_ReturnBookExecutes_ReturnsOkWithObjectWhenSuccessful()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest check out book returns success.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookDaoMock.Setup(booksOut => booksOut.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(0));
+            _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, _patronModelMock.Email, null, "Y", null);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been returned.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_ReturnBookExecutes_ChecksOutBookToFirstPatronOnWaitList()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest check out book returns success.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookDaoMock.Setup(booksOut => booksOut.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(0));
+            _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _bookDaoMock.Setup(bookWait => bookWait.CheckForBookOnWaitList(It.IsAny<string>())).Returns(Task.FromResult(_waitListBooks));
+
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, _patronModelMock.Email, null, "Y", null);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been checked out to first eligible patron on waitlist.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_ReturnBookExecutes_ReturnsBookWhenNoEligiblePatronOnWaitList()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest return book returns success.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookDaoMock.Setup(booksOut => booksOut.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(5));
+            _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _bookDaoMock.Setup(bookWait => bookWait.CheckForBookOnWaitList(It.IsAny<string>())).Returns(Task.FromResult(_waitListBooks));
+
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, _patronModelMock.Email, null, "Y", null);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been returned.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_ReturnBookExecutes_ChecksOutBookToFirstEligiblePatronOnWaitList()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest return book checks out book to elibible patron on waitlist.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookDaoMock.Setup(booksOut => booksOut.GetTotalOfCheckedOutBooks(It.IsAny<int>())).Returns(Task.FromResult(5));
+            _bookDaoMock.Setup(book => book.GetBookByTitleAndId(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.FromResult(_bookModelMock));
+            _bookDaoMock.Setup(bookWait => bookWait.CheckForBookOnWaitList(It.IsAny<string>())).Returns(Task.FromResult(_waitListBooks));
+            var waitBook1 = _waitListBooks.ElementAt(0);
+            _bookDaoMock.Setup(booksOut1 => booksOut1.GetTotalOfCheckedOutBooks(waitBook1.PatronId)).Returns(Task.FromResult(5));
+            var waitBook2 = _waitListBooks.ElementAt(1);
+            _bookDaoMock.Setup(booksOut2 => booksOut2.GetTotalOfCheckedOutBooks(waitBook2.PatronId)).Returns(Task.FromResult(2));
+
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, _patronModelMock.Email, null, "Y", null);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been checked out to first eligible patron on waitlist.", (result as ObjectResult).Value);
+        }
+
+        [TestMethod]
+        public async Task UpdateBookTest_AddBookToWaitListExecutes_ReturnsOKSuccessMessage()
+        {
+            //Arrange
+            Console.WriteLine("Inside UpdateBookTest check out book returns success.");
+            _bookDaoMock.Setup(book => book.GetBookByTitle(It.IsAny<string>())).Returns(Task.FromResult(_bookModelMock));
+            _patronDaoMock.Setup(patron => patron.GetPatronByEmail(It.IsAny<string>())).Returns(Task.FromResult(_patronModelMock));
+            _bookModelMock.Status = "Out";
+            _bookDaoMock.Setup(waitBook => waitBook.BookWaitList(_patronModelMock.Id, _bookModelMock.BookTitle, _bookModelMock.AuthorFName, _bookModelMock.AuthorLName)).Returns(Task.FromResult(_bookModelMock));
+            
+            //Act
+            var result = await _booksControllerMock.UpdateBook(_bookModelMock.BookTitle, _patronModelMock.Email, null, null, "Y");
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ObjectResult);
+            Assert.AreEqual(StatusCodes.Status200OK, (result as ObjectResult).StatusCode);
+            Assert.AreEqual("Wonder and Chaos of Being has been added to waitlist.", (result as ObjectResult).Value);
         }
     }
 }
