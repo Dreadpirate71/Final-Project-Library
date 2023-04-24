@@ -278,7 +278,7 @@ namespace LibraryAPI.Controllers
                 else if (returnBook != null)
                 {
                     var bookPatron = await _bookDao.GetBookByTitleAndId(bookTitle, patron.Id);
-                    if (book == null)
+                    if (bookPatron == null)
                     {
                         return StatusCode(404, "No book checked out by that patron with that title!");
                     }
@@ -298,6 +298,7 @@ namespace LibraryAPI.Controllers
 
                         var waitBook = waitListBooks.ElementAt(elem);
                         var waitStatusMessage = bookTitle + " has been checked out to first eligible patron on waitlist.";
+                        patronBooksOut = await _bookDao.GetTotalOfCheckedOutBooks(waitBook.PatronId);
                         if (patronBooksOut < 5)
                         {
                             book.PatronId = waitBook.PatronId;
