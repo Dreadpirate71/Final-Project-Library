@@ -715,7 +715,7 @@ namespace LibraryAPI.Controllers
             try
             {
                 var staff = await _staffDao.GetStaffById(staffId);
-                
+
                 if (staff == null)
                 { return StatusCode(404, "Staff member with that Id does not exist!"); }
 
@@ -730,23 +730,25 @@ namespace LibraryAPI.Controllers
                     { updateStaff.LastName = staff.LastName; }
                     else { updateStaff.LastName = updateLastName; }
 
-                    if (!patron.IsValidEmailRegEx(updateEmail))
-                    { return StatusCode(400, "Please enter a valid email address!"); }
+                    if (updateEmail == null)
+                    { updateStaff.Email = staff.Email; }
                     else
                     {
-                        var emailUnique = await _staffDao.CheckEmailUnique(updateEmail);
-                        if (emailUnique == true)
-                        {
-                            updateStaff.Email = updateEmail;
-                        }
+                        if (!patron.IsValidEmailRegEx(updateEmail))
+                        { return StatusCode(400, "Please enter a valid email address!"); }
                         else
                         {
-                            return StatusCode(400, "That email is already in use. Please use a different email.");
+                            var emailUnique = await _staffDao.CheckEmailUnique(updateEmail);
+                            if (emailUnique == true)
+                            {
+                                updateStaff.Email = updateEmail;
+                            }
+                            else
+                            {
+                                return StatusCode(400, "That email is already in use. Please use a different email.");
+                            }
                         }
                     }
-                    if (updateEmail == null)
-                    { updateStaff.Email = staff.Email;}
-                    else { updateStaff.Email = updateEmail; }
 
                     if (updatePhoneNumber == null) 
                     { updateStaff.PhoneNumber = staff.PhoneNumber; }

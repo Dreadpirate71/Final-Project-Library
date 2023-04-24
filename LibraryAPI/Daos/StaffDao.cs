@@ -64,28 +64,28 @@ namespace LibraryAPI.Daos
         }
         public async Task<StaffModel> GetStaffByEmail(string email)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = '{email}'";
+            var query = $"SELECT * FROM Staff WHERE Email = '{email}'";
             using var connection = _context.CreateConnection();
             var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
             return staff;
         }
-        public async Task<StaffModel> GetStaffByLastName(string lastName)
+        public async Task <IEnumerable<StaffModel>> GetStaffByLastName(string lastName)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = '{lastName}'";
+            var query = $"SELECT * FROM Staff WHERE LastName = '{lastName}'";
             using var connection = _context.CreateConnection();
-            var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
-            return staff;
+            var staff = await connection.QueryAsync<StaffModel>(query);
+            return staff.ToList();
         }
         public async Task<StaffModel> GetStaffByPhoneNumber(string phoneNumber)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = '{phoneNumber}'";
+            var query = $"SELECT * FROM Staff WHERE PhoneNumber = '{phoneNumber}'";
             using var connection = _context.CreateConnection();
             var staff = await connection.QueryFirstOrDefaultAsync<StaffModel>(query);
             return staff;
         }
         public async Task<IEnumerable<StaffModel>> GetStaffByPosition(string position)
         {
-            var query = $"SELECT * FROM Staff WHERE Id = '{position}'";
+            var query = $"SELECT * FROM Staff WHERE Position = '{position}'";
             using var connection = _context.CreateConnection();
             var staff = await connection.QueryAsync<StaffModel>(query);
             return staff.ToList();

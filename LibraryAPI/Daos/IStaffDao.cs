@@ -12,7 +12,7 @@ namespace LibraryAPI.Daos
         Task<StaffModel> GetStaffById(int id);
         Task<StaffModel> GetStaffByEmail(string email);
         Task<StaffModel> GetStaffByPhoneNumber(string phoneNumber);
-        Task<StaffModel> GetStaffByLastName(string lastName);
+        Task<IEnumerable<StaffModel>> GetStaffByLastName(string lastName);
         Task<IEnumerable<StaffModel>> GetStaffByPosition(string position);
 
         Task DeleteStaffById(int id);
